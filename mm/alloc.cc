@@ -34,6 +34,7 @@ static uint64_t current_offset = 0xffffffffd0000000;
 
     while (current_page_offset <= current_offset) {
         void* block = mm::pmm::get(1);
+        log("%x\n", block);
         if (block == nullptr)
             return 0;
         mm::vmm::kernel_space()->map((uint64_t)block, current_page_offset, PAGE_PRESENT | PAGE_WRITEABLE | PAGE_GLOBAL | PAGE_NX);
@@ -113,29 +114,32 @@ void mm::free(void* ptr)
 
 void* mm::ralloc(void* old_ptr, size_t size)
 {
-    if(!old_ptr && size == 0) return nullptr;
+    if (!old_ptr && size == 0)
+        return nullptr;
 
-    if(size == 0){
-	mm::free(old_ptr);
+    if (size == 0) {
+        mm::free(old_ptr);
         return nullptr;
     }
 
-    if(!old_ptr) return mm::alloc(size);
+    if (!old_ptr)
+        return mm::alloc(size);
 
     mm::heap_hdr* header = (static_cast<mm::heap_hdr*>(old_ptr) - 1);
-    if(header->free){
+    if (header->free) {
         return nullptr;
     }
 
-    if(!header->check_magic()){
+    if (!header->check_magic()) {
         log("alloc: Invalid magic for heap_hdr %x\n", header);
         return nullptr;
     }
 
-    if(header->size >= size) return old_ptr;
+    if (header->size >= size)
+        return old_ptr;
 
     void* ret = mm::alloc(size);
-    if(ret){
+    if (ret) {
         _memcpy(ret, old_ptr, header->size);
         mm::free(old_ptr);
     }
@@ -146,7 +150,7 @@ void* mm::ralloc(void* old_ptr, size_t size)
 void mm::init_alloc()
 {
     // Start small, nothing too big
-    for (size_t i = 0; i < 4; i++) {
+    for (size_t i = 0; i < 8; i++) {
         mm::vmm::kernel_space()->map((uint64_t)mm::pmm::get(1), current_page_offset, PAGE_PRESENT | PAGE_WRITEABLE | PAGE_GLOBAL | PAGE_NX);
         current_page_offset += 4096;
     }

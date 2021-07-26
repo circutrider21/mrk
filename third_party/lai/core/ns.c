@@ -262,9 +262,8 @@ char *lai_stringify_node_path(lai_nsnode_t *node) {
 
     // Build the string from right to left.
     size_t n = length;
-    lai_debug("%lx %lx", (uint64_t)node, (uint64_t)node->parent);
     for (current = node; current->parent; current = current->parent) {
-        n -= 4;
+	n -= 4;
         lai_namecpy(str + n, current->name);
         n -= 1;
         str[n] = '.';

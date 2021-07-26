@@ -676,8 +676,8 @@ void check_and_init(bool bsp)
         writecr("cr4", cr4);
     }
 
-    if(!arch::cpuid(7, 0, eax, ebx, ecx, edx))
-	goto check_for_nx;
+    if (!arch::cpuid(7, 0, eax, ebx, ecx, edx))
+        goto check_for_nx;
 
     if (ebx & CPUID_SMEP) {
         if (bsp) {
@@ -734,8 +734,8 @@ void check_and_init(bool bsp)
     }
 
 check_for_nx:
-    if(!arch::cpuid(0x80000001, eax, ebx, ecx, edx))
-	PANIC("x64/mmu: Unable to check for NX (Execute Disable), Required for boot!\n");
+    if (!arch::cpuid(0x80000001, eax, ebx, ecx, edx))
+        PANIC("x64/mmu: Unable to check for NX (Execute Disable), Required for boot!\n");
 
     if (edx & CPUID_NX) {
         if (bsp) {

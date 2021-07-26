@@ -15,10 +15,10 @@ static inline void _memset(uint64_t b, int c, int len)
     return;
 }
 
-static inline bool _memcmp(const void *s1, const void *s2, size_t len)
+static inline bool _memcmp(const void* s1, const void* s2, size_t len)
 {
-    const uint8_t *p = (const uint8_t*)s1;
-    const uint8_t *q = (const uint8_t*)s2;
+    const uint8_t* p = (const uint8_t*)s1;
+    const uint8_t* q = (const uint8_t*)s2;
 
     // Return if both addresses are the same
     if (s1 == s2) {
@@ -27,7 +27,7 @@ static inline bool _memcmp(const void *s1, const void *s2, size_t len)
 
     while (len > 0) {
         if (*p != *q) {
-	    return false;
+            return false;
         }
 
         len--;
@@ -55,9 +55,10 @@ static inline size_t _strlen(const char* str)
 
 #define ROUND_UP(n, d) (((n)-1) / (d) + 1)
 
-#define PANIC(msg, ...) ({             \
-    log(msg, ##__VA_ARGS__);           \
-    asm volatile ("cli");              \
-    for(;;) { asm volatile ("hlt"); }  \
+#define PANIC(msg, ...) ({   \
+    log(msg, ##__VA_ARGS__); \
+    asm volatile("cli");     \
+    for (;;) {               \
+        asm volatile("hlt"); \
+    }                        \
 })
-

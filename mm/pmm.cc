@@ -1,5 +1,5 @@
-#include <internal/stivale2.h>
 #include <internal/builtin.h>
+#include <internal/stivale2.h>
 #include <mrk/arch.h>
 #include <mrk/pmm.h>
 

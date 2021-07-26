@@ -29,20 +29,20 @@ struct lai_sync_state {
 
     // Freely available to the host.
     // Intended to hold a pointer to a wait queue.
-    void *p;
+    void* p;
 };
 
 // OS-specific functions.
-void *laihost_malloc(size_t);
-void *laihost_realloc(void *, size_t newsize, size_t oldsize);
-void laihost_free(void *, size_t);
+void* laihost_malloc(size_t);
+void* laihost_realloc(void*, size_t newsize, size_t oldsize);
+void laihost_free(void*, size_t);
 
-__attribute__((weak)) void laihost_log(int, const char *);
-__attribute__((weak, noreturn)) void laihost_panic(const char *);
+__attribute__((weak)) void laihost_log(int, const char*);
+__attribute__((weak, noreturn)) void laihost_panic(const char*);
 
-__attribute__((weak)) void *laihost_scan(const char *, size_t);
-__attribute__((weak)) void *laihost_map(size_t, size_t);
-__attribute__((weak)) void laihost_unmap(void *, size_t);
+__attribute__((weak)) void* laihost_scan(const char*, size_t);
+__attribute__((weak)) void* laihost_map(size_t, size_t);
+__attribute__((weak)) void laihost_unmap(void*, size_t);
 __attribute__((weak)) void laihost_outb(uint16_t, uint8_t);
 __attribute__((weak)) void laihost_outw(uint16_t, uint16_t);
 __attribute__((weak)) void laihost_outd(uint16_t, uint32_t);
@@ -59,11 +59,11 @@ __attribute__((weak)) uint32_t laihost_pci_readd(uint16_t, uint8_t, uint8_t, uin
 
 __attribute__((weak)) void laihost_sleep(uint64_t);
 
-__attribute__((weak)) int laihost_sync_wait(struct lai_sync_state *, unsigned int val,
-        int64_t deadline);
-__attribute__((weak)) void laihost_sync_wake(struct lai_sync_state *);
+__attribute__((weak)) int laihost_sync_wait(struct lai_sync_state*, unsigned int val,
+    int64_t deadline);
+__attribute__((weak)) void laihost_sync_wake(struct lai_sync_state*);
 
-__attribute__((weak)) void laihost_handle_amldebug(lai_variable_t *);
+__attribute__((weak)) void laihost_handle_amldebug(lai_variable_t*);
 
 #ifdef __cplusplus
 }

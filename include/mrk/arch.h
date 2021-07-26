@@ -82,4 +82,3 @@ static inline void __outd(uint16_t port, uint32_t data)
                  :
                  : "a"(data), "d"(port));
 }
-

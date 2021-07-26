@@ -186,4 +186,3 @@ extern "C" void __ubsan_handle_missing_return(void* data)
 {
     log("tinyubsan: Missing Return (Unknown Location!)\n");
 }
-

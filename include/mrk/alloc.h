@@ -29,4 +29,3 @@ __attribute__((always_inline)) inline void* operator new([[maybe_unused]] size_t
 
 __attribute__((always_inline)) inline void operator delete(void* obj) { mm::free(obj); }
 __attribute__((always_inline)) inline void operator delete(void* obj, size_t) { mm::free(obj); }
-
