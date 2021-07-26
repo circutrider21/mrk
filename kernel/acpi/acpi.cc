@@ -7,12 +7,6 @@
 #include <mrk/pmm.h>
 #include <mrk/vmm.h>
 
-#include <lai/core.h>
-#include <lai/drivers/ec.h>
-#include <lai/helpers/pc-bios.h>
-#include <lai/helpers/pm.h>
-#include <lai/helpers/sci.h>
-
 static uint64_t revision = 0; // Assume ACPI 1.0 by default
 static klib::vector<uint64_t>* acpi_tables;
 
@@ -77,55 +71,6 @@ void init()
         log("acpi: Found Table \"%s\"\n", buf);
         acpi_tables->push_back(reinterpret_cast<uint64_t>(h));
     }
-/*
-    lai_set_acpi_revision(rsdp->revision);
-    lai_create_namespace();
-
-    // Init the EC (Embedded Controller)
-    LAI_CLEANUP_STATE lai_state_t state;
-    lai_init_state(&state);
-
-    LAI_CLEANUP_VAR lai_variable_t pnp_id = LAI_VAR_INITIALIZER;
-    lai_eisaid(&pnp_id, ACPI_EC_PNP_ID);
-
-    struct lai_ns_iterator it = LAI_NS_ITERATOR_INITIALIZER;
-    lai_nsnode_t* node = NULL;
-    while ((node = lai_ns_iterate(&it))) {
-        if (lai_check_device_pnp_id(node, &pnp_id, &state)) // This is not an EC
-            continue;
-
-        // Found one
-        struct lai_ec_driver* driver = (lai_ec_driver*)mm::alloc(sizeof(struct lai_ec_driver)); // Dynamically allocate the memory since -
-        lai_init_ec(node, driver); // we dont know how many ECs there could be
-
-        struct lai_ns_child_iterator child_it = LAI_NS_CHILD_ITERATOR_INITIALIZER(node);
-        lai_nsnode_t* child_node;
-        while ((child_node = lai_ns_child_iterate(&child_it))) {
-            if (lai_ns_get_node_type(child_node) == LAI_NODETYPE_OPREGION) {
-                if (lai_ns_get_opregion_address_space(child_node) == ACPI_OPREGION_EC) {
-                    lai_ns_override_opregion(child_node, &lai_ec_opregion_override, driver);
-                }
-            }
-        }
-
-        lai_nsnode_t* reg = lai_resolve_path(node, "_REG");
-        if (reg) {
-            LAI_CLEANUP_VAR lai_variable_t address_space = LAI_VAR_INITIALIZER;
-            LAI_CLEANUP_VAR lai_variable_t enable = LAI_VAR_INITIALIZER;
-
-            address_space.type = LAI_INTEGER;
-            address_space.integer = 3; // EmbeddedControl
-
-            enable.type = LAI_INTEGER;
-            enable.integer = 1; // Enable
-
-            lai_api_error_t error = lai_eval_largs(NULL, reg, &state, &address_space, &enable, NULL);
-            if (error != LAI_ERROR_NONE) {
-                // Handle error
-            }
-        }
-    }
-*/
 }
 
 void* get_table(const char* signature, uint64_t index)

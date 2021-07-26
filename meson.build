@@ -58,7 +58,7 @@ add_global_arguments(cpp_flags, language: 'cpp')
 add_global_link_arguments(ld_flags, language: 'cpp')
 
 # Build LAI
-subproject('third_party/lai')
+lai = subproject('lai')
 
 executable('mrk.elf', kernel_sources, nasm_objects, include_directories: include_dirs, dependencies: [lai.get_variable('dependency')], install: true, link_depends: linkscript)
 
