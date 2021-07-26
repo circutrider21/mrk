@@ -55,12 +55,10 @@ ld_flags = ['-T', linkscript, '-nostdlib', '-mcmodel=kernel', '-fno-PIC', '-no-p
             '-Wl,-z,max-page-size=0x1000,-n', '-lgcc']
 
 add_global_arguments(cpp_flags, language: 'cpp')
-add_global_arguments(flags_c_common, language: 'c')
 add_global_link_arguments(ld_flags, language: 'cpp')
 
 # Build LAI
-add_languages('c', required: true)
-subdir('third_party/lai')
+subproject('third_party/lai')
 
-executable('mrk.elf', kernel_sources, nasm_objects, include_directories: include_dirs, dependencies: [lai_dep], install: true, link_depends: linkscript)
+executable('mrk.elf', kernel_sources, nasm_objects, include_directories: include_dirs, dependencies: [lai.get_variable('dependency')], install: true, link_depends: linkscript)
 

@@ -77,11 +77,9 @@ void init()
         log("acpi: Found Table \"%s\"\n", buf);
         acpi_tables->push_back(reinterpret_cast<uint64_t>(h));
     }
-
+/*
     lai_set_acpi_revision(rsdp->revision);
     lai_create_namespace();
-
-    log("Done!\n");
 
     // Init the EC (Embedded Controller)
     LAI_CLEANUP_STATE lai_state_t state;
@@ -127,6 +125,7 @@ void init()
             }
         }
     }
+*/
 }
 
 void* get_table(const char* signature, uint64_t index)
