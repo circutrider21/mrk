@@ -1,0 +1,62 @@
+commit 6604a80d24e8409012b760bb48ae46e48c084ee0
+Author: Yusuf M <circutrider21@gmail.com>
+Date:   Tue Jul 20 20:31:01 2021 -0500
+
+    misc: Added MRK Specific Changes
+
+diff --git a/bfd/config.bfd b/bfd/config.bfd
+index 14523caf..5c28426e 100644
+--- a/bfd/config.bfd
++++ b/bfd/config.bfd
+@@ -718,6 +718,11 @@ case "${targ}" in
+     targ_defvec=i386_pe_vec
+     targ_selvecs="i386_pe_vec i386_pei_vec"
+     ;;
++  x86_64-*-mrk*)
++    targ_defvec=x86_64_elf64_vec
++    targ_selvecs=i386_elf32_vec
++    want64=true
++    ;;
+   i[3-7]86-*-beoself* | i[3-7]86-*-beos*)
+     targ_defvec=i386_elf32_vec
+     targ_selvecs="iamcu_elf32_vec i386_pe_vec i386_pei_vec"
+diff --git a/config.sub b/config.sub
+index f02d43ad..c2abc250 100755
+--- a/config.sub
++++ b/config.sub
+@@ -1356,7 +1356,7 @@ case $os in
+ 	     | cygwin* | msys* | pe* | moss* | proelf* | rtems* \
+ 	     | midipix* | mingw32* | mingw64* | linux-gnu* | linux-android* \
+ 	     | linux-newlib* | linux-musl* | linux-uclibc* \
+-	     | uxpv* | beos* | mpeix* | udk* | moxiebox* \
++	     | uxpv* | beos* | mpeix* | udk* | moxiebox* | mrk* \
+ 	     | interix* | uwin* | mks* | rhapsody* | darwin* \
+ 	     | openstep* | oskit* | conix* | pw32* | nonstopux* \
+ 	     | storm-chaos* | tops10* | tenex* | tops20* | its* \
+diff --git a/gas/configure.tgt b/gas/configure.tgt
+index 33724959..00618e86 100644
+--- a/gas/configure.tgt
++++ b/gas/configure.tgt
+@@ -219,6 +219,7 @@ case ${generic_target} in
+   i386-*-elfiamcu)			fmt=elf arch=iamcu ;;
+   i386-*-elf*)				fmt=elf ;;
+   i386-*-fuchsia*)			fmt=elf ;;
++  x86_64-*-mrk*)                        fmt=elf ;;
+   i386-*-bsd*)				fmt=aout em=386bsd ;;
+   i386-*-netbsdpe*)			fmt=coff em=pe ;;
+   i386-*-netbsd*-gnu* | \
+diff --git a/ld/configure.tgt b/ld/configure.tgt
+index 87c7d9a4..b9e78cf9 100644
+--- a/ld/configure.tgt
++++ b/ld/configure.tgt
+@@ -324,6 +324,10 @@ i[3-7]86-*-linux-*)	targ_emul=elf_i386
+ 			targ64_extra_emuls="elf_x86_64 elf32_x86_64 elf_l1om elf_k1om"
+ 			targ64_extra_libpath="elf_x86_64 elf32_x86_64"
+ 			;;
++x86_64-*-mrk*)
++                        targ_emul=elf_x86_64
++			targ_extra_emuls=elf_i386
++			;;
+ i[3-7]86-*-redox*)	targ_emul=elf_i386
+ 			targ_extra_emuls=elf_x86_64
+ 			;;
