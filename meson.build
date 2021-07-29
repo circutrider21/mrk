@@ -14,8 +14,11 @@ kernel_sources = files(
     'mm/alloc.cc',
     'mm/mmap.cc',
 
+    'fs/fs.cc',
+    'fs/node.cc',
+    'fs/tmpfs.cc',
+
     'kernel/acpi/acpi.cc',
-    'kernel/acpi/acpi_lai.cc',
     'kernel/proc/simd.cc',
     'kernel/log.cc',
     'kernel/lock.cc',
@@ -36,11 +39,11 @@ nasm_objects = nasm_gen.process(kernel_asm_sources)
 
 # Common flags shared across all C-family languages
 flags_c_common = ['-m64', '-march=x86-64', '-fno-PIC', '-ffreestanding', '-mno-red-zone', 
-                  '-nostdlib', '-mcmodel=kernel', '-fno-stack-protector',
+                  '-nostdlib', '-mcmodel=kernel', '-fstack-protector', 
                   '-mno-mmx', '-mno-sse', '-mno-sse2', '-mno-sse3', '-mno-sse4', '-mno-sse4.1', '-mno-sse4.2', '-mno-sse4a']
 
 if get_option('enable_ubsan')
-    flags_c_common +=  ['-fsanitize=undefined']
+    flags_c_common +=  ['-fsanitize=integer']
     kernel_sources += ['kernel/ubsan.cc']
 endif
 
@@ -57,8 +60,5 @@ ld_flags = ['-T', linkscript, '-nostdlib', '-mcmodel=kernel', '-fno-PIC', '-no-p
 add_global_arguments(cpp_flags, language: 'cpp')
 add_global_link_arguments(ld_flags, language: 'cpp')
 
-# Build LAI
-lai = subproject('lai')
-
-executable('mrk.elf', kernel_sources, nasm_objects, include_directories: include_dirs, dependencies: [lai.get_variable('dependency')], install: true, link_depends: linkscript)
+executable('mrk.elf', kernel_sources, nasm_objects, include_directories: include_dirs, install: true, link_depends: linkscript)
 

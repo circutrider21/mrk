@@ -44,6 +44,8 @@ static inline size_t _strlen(const char* str)
             return len;
 }
 
+#define _strcmp(str1, str2) _memcmp(str1, str2, _strlen(str1))
+
 #define _memcpy(src, dest, count) asm("rep movsd"                                           \
                                       :                                                     \
                                       : "S"((uint64_t)src), "D"((uint64_t)dest), "c"(count) \

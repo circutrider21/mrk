@@ -1,93 +1,117 @@
 #pragma once
 
-#include <klib/vector.h>
+#include <cstddef>
+#include <cstdint>
+#include <mrk/lock.h>
 
-// Max length definitions
-#define MAX_PATH_LEN 4096
-#define MAX_NAME_LEN 256
+#define O_ACCMODE 0x0007
+#define O_EXEC 1
+#define O_RDONLY 2
+#define O_RDWR 3
+#define O_SEARCH 4
+#define O_WRONLY 5
+
+#define O_APPEND 0x0008
+#define O_CREAT 0x0010
+#define O_DIRECTORY 0x0020
+#define O_EXCL 0x0040
+#define O_NOCTTY 0x0080
+#define O_NOFOLLOW 0x0100
+#define O_TRUNC 0x0200
+#define O_NONBLOCK 0x0400
+#define O_DSYNC 0x0800
+#define O_RSYNC 0x1000
+#define O_SYNC 0x2000
+#define O_CLOEXEC 0x4000
+
+#define S_IFMT 0x0F000
+#define S_IFBLK 0x06000
+#define S_IFCHR 0x02000
+#define S_IFIFO 0x01000
+#define S_IFREG 0x08000
+#define S_IFDIR 0x04000
+#define S_IFLNK 0x0A000
+#define S_IFSOCK 0x0C000
+#define S_IFPIPE 0x03000
+
+#define S_ISBLK(m) (((m)&S_IFMT) == S_IFBLK)
+#define S_ISCHR(m) (((m)&S_IFMT) == S_IFCHR)
+#define S_ISFIFO(m) (((m)&S_IFMT) == S_IFIFO)
+#define S_ISREG(m) (((m)&S_IFMT) == S_IFREG)
+#define S_ISDIR(m) (((m)&S_IFMT) == S_IFDIR)
+#define S_ISLNK(m) (((m)&S_IFMT) == S_IFLNK)
+#define S_ISSOCK(m) (((m)&S_IFMT) == S_IFSOCK)
 
 namespace fs {
-    // Diffrent types of vfs nodes
-    enum class node_type : uint8_t {
-        file,
-        directory,
-        link,
-        pipe,
-        blockdev,
-        chardev,
-        mountpoint
-    };
+struct filesystem;
 
-    enum class open_mode : uint8_t {
-        read,
-        write,
-        readwrite
-    };
+struct inode {
+    size_t actual_size;
 
-    struct filesystem {
-        char name[16];
-        bool no_backing; // is it backed by a device or memory ?
+    int refcount; // Keeps track of how many refrences
+    mutex lock;
 
-        // Required to be implemented by the filesystem
-        virtual fs::inode* mount(fs::inode* device) const = 0;
-        virtual int64_t mknode(fs::tnode* n) const = 0;
-        virtual int64_t read(fs::inode* n, size_t offset, size_t len, void* buff) const = 0;
-        virtual int64_t write(fs::inode* n, size_t offset, size_t len, const void* buff) const = 0;
-        virtual int64_t sync(fs::inode* n) const = 0;
-        virtual int64_t refresh(fs::inode* n) const = 0;
-        virtual int64_t setlink(fs::tnode* n, fs::inode* target) const = 0;
-        virtual int64_t ioctl(fs::inode* n, int64_t req_param, void* req_data) const = 0;
-    };
+    // Stat information
+    uint64_t st_dev;
+    uint64_t st_ino;
+    int32_t st_mode;
+    int32_t st_nlink;
+    int32_t st_uid;
+    int32_t st_gid;
+    uint64_t st_rdev;
+    int64_t st_size;
 
-    struct tnode {
-        char name[MAX_NAME_LEN];
-        fs::inode* inode;
-        fs::inode* parent;
-	fs::tnode* sibling;
-    };
+    int64_t st_atim_sec;
+    long st_atim_nsec;
+    int64_t st_mtim_sec;
+    long st_mtim_nsec;
+    int64_t st_ctim_sec;
+    long st_ctim_nsec;
 
-    struct fs::inode {
-        vfs_node_type_t type;
-        size_t size;
-        uint32_t perms;
-        uint32_t uid;
-        uint32_t refcount;
-        vfs_fsinfo_t* fs;
-        void* ident;
-        vfs_tnode_t* mountpoint;
-        klib::vector<fs::tnode*> child;
-    };
+    int64_t st_blksize;
+    int64_t st_blocks;
 
-// structure describing an open node
-typedef struct {
-    vfs_tnode_t* tnode;
-    fs::inode* inode;
-    vfs_openmode_t mode;
-    size_t seek_pos;
-} vfs_node_desc_t;
+    int (*close)(struct fs::inode*);
+    int64_t (*read)(struct fs::inode* self, void* buf, int64_t loc, size_t count);
+    int64_t (*write)(struct fs::inode* self, const void* buf, int64_t loc, size_t count);
+    bool (*grow)(struct fs::inode* self, size_t new_size);
+    int (*ioctl)(struct fs::inode* self, int request, void* argp);
+};
 
-// directory entry structure
-typedef struct {
-    vfs_node_type_t type;
-    size_t record_len;
-    char name[VFS_MAX_NAME_LEN];
-} vfs_dirent_t;
+struct node {
+    struct fs::node* redir;
+    char name[128];
+    char target[128];
+    fs::inode* res;
+    void* mount_data;
+    uint64_t dev_id;
+    struct fs::filesystem* fs;
+    struct fs::node* mount_gate;
+    struct fs::node* parent;
+    struct fs::node* child;
+    struct fs::node* next;
+};
 
-void vfs_init();
-void vfs_register_fs(vfs_fsinfo_t* fs);
-vfs_fsinfo_t* vfs_get_fs(char* name);
-void vfs_debug();
+struct filesystem {
+    const char* name;
+    bool is_backed;
 
-    fs::handle open(char* path, open_mode mode);
-    int64_t create(char* path, node_type type);
-    int64_t close(fs::handle handle);
-    int64_t seek(fs::handle handle, size_t pos);
-    int64_t read(fs::handle handle, size_t len, void* buff);
-    int64_t write(fs::handle handle, size_t len, const void* buff);
-    int64_t chmod(fs::handle handle, int32_t newperms);
-    int64_t link(char* oldpath, char* newpath);
-    int64_t unlink(char* path);
-    int64_t getdent(fs::handle handle, fs::dirent* dirent);
-    int64_t mount(char* device, char* path, char* fsname);
+    struct fs::node* (*mount)(struct fs::inode* device);
+    struct fs::node* (*populate)(struct fs::node* node);
+    struct fs::inode* (*open)(struct fs::node* node, bool new_node, uint32_t mode);
+    struct fs::inode* (*symlink)(struct fs::node* node);
+    struct fs::inode* (*mkdir)(struct fs::node* node, uint32_t mode);
+};
+
+void init();
+fs::node* create_node(fs::node* parent, const char* name, bool deep = false);
+fs::node* mkdir(fs::node* parent, const char* name, uint32_t mode, bool do_loop);
+fs::inode* open(fs::node** dir, fs::node* parent, const char* path, int oflags, uint32_t mode);
+bool symlink(fs::node* parent, const char* target, const char* path);
+bool mount(const char* source, const char* target, const char* fs_type);
+
+filesystem* get_filesystem(const char* fs_name);
+bool register_filesystem(fs::filesystem* fs);
 }
 
+extern fs::node* fs_root;

@@ -19,7 +19,7 @@ void init()
 {
     uint64_t cr = 0;
     readcr("cr0", &cr);
-    cr &= ~(1 << 2); // Disable FPU Emulation
+    cr &= ~(1ull << 2); // Disable FPU Emulation
     cr |= (1 << 5); // Enable Native Exceptions
     cr |= (1 << 1); // Monitor Coprocessor
     writecr("cr0", cr);

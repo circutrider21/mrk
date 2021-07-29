@@ -3,6 +3,7 @@
 #include <mrk/apic.h>
 #include <mrk/arch.h>
 #include <mrk/cpu.h>
+#include <mrk/fs.h>
 #include <mrk/idt.h>
 #include <mrk/pmm.h>
 #include <mrk/proc.h>
@@ -123,6 +124,7 @@ void _start(struct stivale2_struct* stivale2_struct)
 
     mm::init_alloc();
     acpi::init();
+    fs::init();
     smp::init_others();
     // proc::init();
 

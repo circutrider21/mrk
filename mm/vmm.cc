@@ -270,7 +270,9 @@ void init()
                 PAGE_PRESENT | PAGE_WRITEABLE);
     }
 
-    flush_buffer();
+    log("cha!\n");
+
+    // flush_buffer();
 
     kspace.load();
 }
