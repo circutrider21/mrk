@@ -1,4 +1,4 @@
-name: CMake
+name: Meson
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Configure
-      run: meson setup -Dbuildtype=${{env.BUILD_TYPE}} build
+      run: pip3 install meson && meson setup -Dbuildtype=${{env.BUILD_TYPE}} build
 
     - name: Build
       # Build your program with the given configuration
@@ -31,7 +31,7 @@ jobs:
     - name: Bundle
       run: strip build/mrk.elf && ./tools/bundle_iso.sh build
       
-    - name: Upload a Build Artifact
+    - name: Distribute
       uses: actions/upload-artifact@v2.2.4
       with:
         # Artifact name
