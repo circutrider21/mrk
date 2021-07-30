@@ -22,7 +22,7 @@ bool mutex::locked()
 
 uintptr_t __stack_chk_guard = 0x941e9fac24fcb746;
 
-__attribute__((noreturn)) extern "C" void __stack_chk_fail(void)
+extern "C" void __stack_chk_fail(void)
 {
     PANIC("Stack smashing detected");
 }

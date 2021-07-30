@@ -121,5 +121,6 @@ void fs::init()
             break;
     }
 
-    log("fs: Imported Initramfs!\n");
+    log("fs: Imported Initramfs! (Size: %d)\n", initramfs_size);
 }
+
