@@ -1,5 +1,7 @@
 project('mrk', 'cpp', version: '0.1.0')
 
+add_languages('c')
+
 kernel_sources = files( 
     'arch/apic.cc',
     'arch/arch.cc',
@@ -22,6 +24,8 @@ kernel_sources = files(
     'kernel/proc/simd.cc',
     'kernel/log.cc',
     'kernel/lock.cc',
+
+    'lib/klib/alloc.c',
 )
 
 include_dirs = include_directories(['include', 'include/lib'])
@@ -39,13 +43,8 @@ nasm_objects = nasm_gen.process(kernel_asm_sources)
 
 # Common flags shared across all C-family languages
 flags_c_common = ['-m64', '-march=x86-64', '-fno-PIC', '-ffreestanding', '-mno-red-zone', 
-                  '-nostdlib', '-mcmodel=kernel', '-fstack-protector', 
+                  '-nostdlib', '-mcmodel=kernel', '-fno-stack-protector', 
                   '-mno-mmx', '-mno-sse', '-mno-sse2', '-mno-sse3', '-mno-sse4', '-mno-sse4.1', '-mno-sse4.2', '-mno-sse4a']
-
-if get_option('enable_ubsan')
-    flags_c_common +=  ['-fsanitize=integer']
-    kernel_sources += ['kernel/ubsan.cc']
-endif
 
 cpp_flags = flags_c_common
 cpp_flags += ['-std=c++17', '-fno-exceptions', '-fno-rtti']
@@ -56,6 +55,13 @@ cpp_flags += ['-Wno-inline-new-delete', '-Wno-write-strings']
 linkscript = meson.current_source_dir() + '/misc/kernel.ld'
 ld_flags = ['-T', linkscript, '-nostdlib', '-mcmodel=kernel', '-fno-PIC', '-no-pie', '-Wl,--build-id=none', 
             '-Wl,-z,max-page-size=0x1000,-n', '-lgcc']
+
+add_global_arguments(flags_c_common, language: 'c')
+
+if get_option('enable_ubsan')
+    flags_c_common +=  ['-fsanitize=undefined']
+    kernel_sources += ['kernel/ubsan.cc']
+endif
 
 add_global_arguments(cpp_flags, language: 'cpp')
 add_global_link_arguments(ld_flags, language: 'cpp')

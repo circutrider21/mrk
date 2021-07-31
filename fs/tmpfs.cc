@@ -2,6 +2,7 @@
 #include <mrk/alloc.h>
 #include <mrk/fs.h>
 #include <mrk/lock.h>
+#include <mrk/log.h>
 
 static mutex tmpfs_lock;
 
@@ -11,30 +12,6 @@ struct tmpfs_res : public fs::inode {
 };
 
 extern fs::filesystem tmpfs;
-
-static fs::node* tmpfs_mount(fs::inode* device)
-{
-    (void)device;
-
-    fs::node* mount_gate = new fs::node;
-
-    mount_gate->fs = &tmpfs;
-
-    mount_gate->mount_data = mm::alloc(sizeof(uint64_t));
-
-    *((uint64_t*)mount_gate->mount_data) = 1;
-
-    fs::inode* res = (fs::inode*)mm::alloc(sizeof(tmpfs_res));
-    res->actual_size = sizeof(tmpfs_res);
-    res->st_mode = 0755 | S_IFDIR;
-    res->st_ino = (*((uint64_t*)mount_gate->mount_data))++;
-    res->st_blksize = 512;
-    res->st_nlink = 1;
-
-    mount_gate->res = res;
-
-    return mount_gate;
-}
 
 static int64_t tmpfs_read(fs::inode* _this, void* buf, int64_t off, size_t count)
 {
@@ -58,8 +35,7 @@ static int64_t tmpfs_write(fs::inode* _this, const void* buf, int64_t off, size_
     tmpfs_lock.lock();
 
     if (off + count > self->allocated_size) {
-        while (off + count > self->allocated_size)
-            self->allocated_size <<= 1;
+	self->allocated_size = off + count;
 
         self->data = (char*)mm::ralloc(self->data, self->allocated_size);
     }
@@ -106,7 +82,7 @@ static fs::inode* tmpfs_open(fs::node* node, bool create, uint32_t mode)
     if (!create)
         return nullptr;
 
-    tmpfs_res* res = (tmpfs_res*)mm::alloc(sizeof(tmpfs_res));
+    tmpfs_res* res = (tmpfs_res*)new tmpfs_res();
 
     res->allocated_size = 4096;
     res->data = (char*)mm::alloc(res->allocated_size);
@@ -117,13 +93,41 @@ static fs::inode* tmpfs_open(fs::node* node, bool create, uint32_t mode)
     res->st_ino = (*((uint64_t*)node->mount_data))++;
     res->st_mode = (mode & ~S_IFMT) | S_IFREG;
     res->st_nlink = 1;
-    res->close = tmpfs_close;
-    res->read = tmpfs_read;
-    res->write = tmpfs_write;
-    res->grow = tmpfs_grow;
+    res->close = &tmpfs_close;
+    res->read = &tmpfs_read;
+    res->write = &tmpfs_write;
+    res->grow = &tmpfs_grow;
     res->actual_size = sizeof(tmpfs_res);
 
     return (fs::inode*)res;
+}
+
+static fs::node* tmpfs_mount(fs::inode* device)
+{
+    (void)device;
+
+    fs::node* mount_gate = new fs::node;
+
+    mount_gate->fs = &tmpfs;
+
+    mount_gate->mount_data = mm::alloc(sizeof(uint64_t));
+
+    *((uint64_t*)mount_gate->mount_data) = 1;
+
+    fs::inode* res = (fs::inode*) new tmpfs_res();
+    res->actual_size = sizeof(tmpfs_res);
+    res->st_mode = 0755 | S_IFDIR;
+    res->st_ino = (*((uint64_t*)mount_gate->mount_data))++;
+    res->st_blksize = 512;
+    res->st_nlink = 1;
+    res->close = &tmpfs_close;
+    res->read = &tmpfs_read;
+    res->write = &tmpfs_write;
+    res->grow = &tmpfs_grow;
+
+    mount_gate->res = res;
+
+    return mount_gate;
 }
 
 static fs::inode* tmpfs_symlink(fs::node* node)

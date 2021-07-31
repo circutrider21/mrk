@@ -15,7 +15,7 @@
 #include <mrk/acpi.h>
 #include <mrk/log.h>
 
-static uint8_t _stack[4096];
+static uint8_t _stack[8192] = {0};
 void (*term_write)(const char* string, size_t length);
 static struct stivale2_struct* bootlog;
 
@@ -122,7 +122,6 @@ void _start(struct stivale2_struct* stivale2_struct)
     arch::init_apic();
     arch::cpu::init();
 
-    mm::init_alloc();
     acpi::init();
     fs::init();
     smp::init_others();

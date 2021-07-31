@@ -76,7 +76,9 @@ void fs::init()
     fs_root->name[0] = '/';
 
     fs::register_filesystem(&tmpfs);
-    fs::mount("tmpfs", "/", "tmpfs");
+    bool data = fs::mount("tmpfs", "/", "tmpfs");
+    if(!data)
+	PANIC("Unable to mount tmpfs\n");
 
     // Mount the initramfs
     stivale2_struct_tag_modules* modules_tag = (stivale2_struct_tag_modules*)arch::stivale2_get_tag(STIVALE2_STRUCT_TAG_MODULES_ID);
@@ -115,7 +117,10 @@ void fs::init()
         }
         }
 
-        h = (ustar_header*)h + 512 + ALIGN_UP(size, 512);
+	h = (ustar_header*)((uint64_t)h + ((size / 512) + 1) * 512);
+ 
+        if (size % 512)
+            h = (ustar_header*)((uint64_t)h + 512);
 
         if ((uintptr_t)h >= initramfs_addr + initramfs_size)
             break;

@@ -15,7 +15,6 @@ fs::node* path2node(fs::node* parent, const char* _path, int mode)
 {
     bool last = false;
 
-    // log("TRACE: path_to_node(%x, %s, %d)\n", parent, _path, mode);
     // Make some checks on the path...
     if (_path == nullptr)
         return nullptr;
@@ -289,6 +288,7 @@ bool fs::mount(const char* source, const char* target, const char* fs_type)
         backing_dev_id = backing_dev_node->res->st_rdev;
     }
 
+
     fs::node* mount_gate = fs->mount(src_handle);
     if (mount_gate == nullptr) {
         src_handle->close(src_handle);
@@ -320,7 +320,8 @@ bool fs::mount(const char* source, const char* target, const char* fs_type)
         dd->redir = mount_gate->parent;
     }
 
-    log("fs: `%s` is now mounted as '%s'. (type: `%s`)\n", source == nullptr ? "<no-device>" : source, target, fs_type);
+    // log("fs: `%s` is now mounted as '%s'. (type: `%s`)\n", source, target, fs_type);
 
     return true;
 }
+

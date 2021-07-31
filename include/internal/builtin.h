@@ -58,6 +58,7 @@ static inline size_t _strlen(const char* str)
 #define ROUND_UP(n, d) (((n)-1) / (d) + 1)
 
 #define PANIC(msg, ...) ({   \
+    log("PANIC: ");          \
     log(msg, ##__VA_ARGS__); \
     asm volatile("cli");     \
     for (;;) {               \
