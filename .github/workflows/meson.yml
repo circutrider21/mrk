@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Configure
-      run: pip3 install meson ninja && sudo apt install nasm && meson setup -Dbuildtype=${{env.BUILD_TYPE}} build
+      run: pip3 install meson ninja && sudo apt install nasm clang && CXX=clang++ CC=clang CXX_LD=lld meson setup -Dbuildtype=${{env.BUILD_TYPE}} build
 
     - name: Build
       # Build your program with the given configuration

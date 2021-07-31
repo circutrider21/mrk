@@ -16,8 +16,8 @@ then
     exit 1
 fi
 
-ninja -C $1 &> /dev/null
-./tools/bundle_iso.sh $1
-qemu-system-x86_64 -m 2G -M q35 -cdrom $1/mrk-image.iso -debugcon stdio -s
+ninja -C $1
+./tools/bundle_iso.sh $1 &> /dev/null
+qemu-system-x86_64 --enable-kvm -cpu host -m 2G -M q35 -cdrom $1/mrk-image.iso -debugcon stdio -s
 
 
