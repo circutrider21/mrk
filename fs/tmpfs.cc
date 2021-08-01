@@ -1,10 +1,10 @@
 #include <internal/builtin.h>
+#include <internal/lock.h>
 #include <mrk/alloc.h>
 #include <mrk/fs.h>
-#include <mrk/lock.h>
 #include <mrk/log.h>
 
-static mutex tmpfs_lock;
+static spinlock tmpfs_lock;
 
 struct tmpfs_res : public fs::inode {
     size_t allocated_size;
@@ -16,15 +16,13 @@ extern fs::filesystem tmpfs;
 static int64_t tmpfs_read(fs::inode* _this, void* buf, int64_t off, size_t count)
 {
     tmpfs_res* self = (tmpfs_res*)_this;
-
-    tmpfs_lock.lock();
+    lock_retainer guard{tmpfs_lock};
 
     if (off + count > (size_t)self->st_size)
         count -= (off + count) - self->st_size;
 
     _memcpy(self->data + off, buf, count);
 
-    tmpfs_lock.unlock();
     return count;
 }
 
@@ -32,7 +30,7 @@ static int64_t tmpfs_write(fs::inode* _this, const void* buf, int64_t off, size_
 {
     tmpfs_res* self = (tmpfs_res*)_this;
 
-    tmpfs_lock.lock();
+    lock_retainer guard{tmpfs_lock};
 
     if (off + count > self->allocated_size) {
 	self->allocated_size = off + count;
@@ -43,20 +41,17 @@ static int64_t tmpfs_write(fs::inode* _this, const void* buf, int64_t off, size_
     _memcpy(buf, self->data + off, count);
 
     self->st_size += count;
-
-    tmpfs_lock.unlock();
     return count;
 }
 
 static int tmpfs_close(fs::inode* _this)
 {
     tmpfs_res* self = (tmpfs_res*)_this;
-
     tmpfs_lock.lock();
 
     self->refcount--;
-
     tmpfs_lock.unlock();
+    
     return 0;
 }
 
@@ -64,7 +59,7 @@ static bool tmpfs_grow(fs::inode* _this, size_t new_size)
 {
     tmpfs_res* res = (tmpfs_res*)_this;
 
-    tmpfs_lock.lock();
+    lock_retainer guard{tmpfs_lock};
 
     while (new_size > res->allocated_size)
         res->allocated_size <<= 1; // size * 2
@@ -72,8 +67,6 @@ static bool tmpfs_grow(fs::inode* _this, size_t new_size)
     res->data = (char*)mm::ralloc(res->data, res->allocated_size);
 
     res->st_size = new_size;
-
-    tmpfs_lock.unlock();
     return true;
 }
 
@@ -106,7 +99,7 @@ static fs::node* tmpfs_mount(fs::inode* device)
 {
     (void)device;
 
-    fs::node* mount_gate = new fs::node;
+    fs::node* mount_gate = new fs::node();
 
     mount_gate->fs = &tmpfs;
 
@@ -126,6 +119,7 @@ static fs::node* tmpfs_mount(fs::inode* device)
     res->grow = &tmpfs_grow;
 
     mount_gate->res = res;
+    log("%x\n", mount_gate);
 
     return mount_gate;
 }

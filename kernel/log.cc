@@ -1,5 +1,5 @@
 #include <mrk/arch.h>
-#include <mrk/lock.h>
+#include <internal/lock.h>
 #include <mrk/log.h>
 
 #include <cstdbool>
@@ -108,9 +108,8 @@ void log(char* fmt, ...)
     va_list v;
     va_start(v, fmt);
 
-    log_mutex.lock();
+    lock_retainer rk{log_mutex};
     vprintf(fmt, v);
-    log_mutex.unlock();
 
     va_end(v);
 }
@@ -120,7 +119,7 @@ void _todo(char* file, int line, char* fmt, ...)
     va_list va;
     va_start(va, fmt);
 
-    log_mutex.lock();
+    lock_retainer rk{log_mutex};
 
     // Print todo header
     puts("TODO(");
@@ -131,7 +130,6 @@ void _todo(char* file, int line, char* fmt, ...)
 
     vprintf(fmt, va);
 
-    log_mutex.unlock();
     va_end(va);
 }
 

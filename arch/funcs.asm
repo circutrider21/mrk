@@ -56,3 +56,55 @@ asm_xrstor:
     pop rdx
     pop rdx
     ret
+
+; Spinlock stuff
+
+global __spinlock_lock
+__spinlock_lock:
+    push rbp
+    mov rbp, rsp
+
+    lock bts word [rdi], 0
+    jnc .acquired
+
+.retry:
+    pause
+
+    bt word [rdi], 0
+    jc .retry
+
+    lock bts word [rdi], 0
+    jc .retry
+
+.acquired:
+    mov rsp, rbp
+    pop rbp
+    ret
+
+global __spinlock_unlock
+__spinlock_unlock:
+    push rbp
+    mov rbp, rsp
+
+    lock btr word [rdi], 0
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+global __spinlock_try
+__spinlock_try:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 1
+
+    lock bts word [rdi], 0
+    jnc .success
+
+    mov rax, 0
+.success:
+    mov rsp, rbp
+    pop rbp
+    ret
+

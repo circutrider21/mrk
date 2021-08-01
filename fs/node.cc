@@ -22,11 +22,15 @@ fs::node* path2node(fs::node* parent, const char* _path, int mode)
         return nullptr;
 
     char l_path[_strlen(_path) + 1];
-    _strcpy(l_path, _path);
+    _strcpy(_path, l_path);
 
     char* path = l_path;
 
-    fs::node* cur_parent = *path == '/' || parent == nullptr ? fs_root : parent;
+    fs::node* cur_parent = parent;
+    if(*path == '/' || parent == nullptr)
+	cur_parent = fs_root;
+    
+    // fs::node* cur_parent = *path == '/' || parent == nullptr ? fs_root : parent;
 
     while (cur_parent->redir != nullptr)
         cur_parent = cur_parent->redir;
@@ -152,7 +156,7 @@ fs::node* fs::create_node(fs::node* parent, const char* name, bool deep)
     fs::node* new_node = path2node(parent, name, NODE_NO_CREATE);
 
     // Node better not exist...
-    if (new_node != nullptr && new_node != fs_root) {
+    if (new_node != nullptr) {
         return nullptr;
     }
 

@@ -1,4 +1,4 @@
-#include <mrk/lock.h>
+#include <internal/lock.h>
 #include <mrk/pmm.h>
 #include <mrk/vmm.h>
 #include <cstddef>

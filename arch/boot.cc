@@ -120,6 +120,7 @@ void _start(struct stivale2_struct* stivale2_struct)
     arch::init_pit();
 
     arch::init_apic();
+    arch::sleep(30000000);
     arch::cpu::init();
 
     acpi::init();

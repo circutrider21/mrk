@@ -8,7 +8,8 @@
 
 #include <cstddef>
 #include <mrk/alloc.h>
-#include <mrk/lock.h>
+#include <internal/lock.h>
+#include <internal/atomic.h>
 #include <mrk/log.h>
 
 using namespace arch::cpu;
@@ -16,7 +17,7 @@ using namespace arch::idt;
 
 static struct stivale2_struct_tag_smp* tag_smp;
 static cpu_info* cpu_locals;
-static mutex smp_mutex;
+static spinlock smp_lock;
 static uint64_t active_cpus = 1; // The BSP is already active
 
 static void init_ap(struct stivale2_smp_info* blog)
@@ -24,7 +25,7 @@ static void init_ap(struct stivale2_smp_info* blog)
     cpu_info* my_log = (cpu_info*)blog->extra_argument;
     my_log->store();
 
-    smp_mutex.lock();
+    smp_lock.lock();
 
     mm::vmm::check_and_init(false);
     mm::vmm::kernel_space()->load();
@@ -33,10 +34,10 @@ static void init_ap(struct stivale2_smp_info* blog)
 
     arch::init_apic();
 
-    smp_mutex.unlock();
+    smp_lock.unlock();
 
     // log("smp: CPU #%d online!\n", arch::cpu::current()->cpu_number);
-    LOCKED_INC(active_cpus);
+    atomic_inc<uint64_t>(active_cpus);
 
     asm volatile("sti");
     for (;;) {
@@ -77,7 +78,7 @@ void init_others()
         tag_smp->smp_info[i].goto_address = (uint64_t)init_ap;
     }
 
-    while (LOCKED_READ(active_cpus) != tag_smp->cpu_count)
+    while (atomic_read<uint64_t>(active_cpus) != tag_smp->cpu_count)
         ;
 }
 

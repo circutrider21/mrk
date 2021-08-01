@@ -2,7 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <mrk/lock.h>
+#include <internal/lock.h>
 
 #define O_ACCMODE 0x0007
 #define O_EXEC 1

@@ -4,7 +4,7 @@
 #include <klib/vector.h>
 #include <mrk/alloc.h>
 #include <mrk/idt.h>
-#include <mrk/lock.h>
+#include <internal/lock.h>
 #include <mrk/vmm.h>
 
 // The max number of running threads, change with caution

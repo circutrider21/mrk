@@ -15,26 +15,17 @@ static inline void _memset(uint64_t b, int c, int len)
     return;
 }
 
-static inline bool _memcmp(const void* s1, const void* s2, size_t len)
+static inline int _memcmp(const void* str1, const void* str2, size_t count)
 {
-    const uint8_t* p = (const uint8_t*)s1;
-    const uint8_t* q = (const uint8_t*)s2;
+  const unsigned char *s1 = (const unsigned char*)str1;
+  const unsigned char *s2 = (const unsigned char*)str2;
 
-    // Return if both addresses are the same
-    if (s1 == s2) {
-        return true;
+  while (count-- > 0)
+    {
+      if (*s1++ != *s2++)
+	  return s1[-1] < s2[-1] ? -1 : 1;
     }
-
-    while (len > 0) {
-        if (*p != *q) {
-            return false;
-        }
-
-        len--;
-        p++;
-        q++;
-    }
-    return false;
+  return 0;
 }
 
 static inline size_t _strlen(const char* str)

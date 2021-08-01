@@ -1,9 +1,10 @@
 #include <internal/builtin.h>
 #include <internal/stivale2.h>
+#include <internal/lock.h>
+
 #include <mrk/arch.h>
 #include <mrk/cpu.h>
 #include <mrk/idt.h>
-#include <mrk/lock.h>
 #include <mrk/log.h>
 #include <mrk/pmm.h>
 #include <mrk/vmm.h>
@@ -17,7 +18,7 @@
 
 bool mmu_features[6];
 mm::vmm::aspace kspace;
-static mutex vmm_mutex;
+static spinlock vmm_lock;
 
 using namespace arch::cpu;
 using namespace arch::idt;
@@ -508,7 +509,7 @@ uint64_t alloc()
     uint64_t lru_pcid;
     uint64_t use_pcid = ~0ull;
 
-    vmm_mutex.lock();
+    lock_retainer guard{vmm_lock};
 
     for (cur_pcid = 0; cur_pcid < 16; cur_pcid++) {
 
@@ -521,15 +522,14 @@ uint64_t alloc()
 
     pcid_cache[lru_pcid]++;
 
-    vmm_mutex.unlock();
     return lru_pcid;
 }
 
 void free(uint64_t id)
 {
-    vmm_mutex.lock();
+    lock_retainer guard{vmm_lock};
+    
     pcid_cache[id]--;
-    vmm_mutex.unlock();
 }
 
 void apply(uint64_t cr3, uint64_t pcid)
@@ -656,7 +656,7 @@ void free(uint8_t key, bool supervisor)
 namespace mm::vmm {
 void check_and_init(bool bsp)
 {
-    vmm_mutex.lock();
+    lock_retainer guard{vmm_lock};
 
     uint32_t eax, ebx, ecx, edx;
     arch::cpuid(1, eax, ebx, ecx, edx);
@@ -770,8 +770,6 @@ check_for_nx:
 
     // Overwrite PAT with our value
     wrmsr(0x277, 0x06 | (0x01 << 8) | (0x04 << 16) | (0 << 24));
-
-    vmm_mutex.unlock();
 }
 
 aspace*

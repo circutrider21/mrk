@@ -1,5 +1,5 @@
 #include <internal/builtin.h>
-#include <mrk/lock.h>
+#include <internal/lock.h>
 #include <mrk/log.h>
 #include <mrk/mmap.h>
 #include <mrk/pmm.h>
@@ -8,18 +8,17 @@ static mutex mmap_mutex;
 
 void mmap(mm::vmm::aspace* space, uint64_t sz, void* virt, void* phys, int prot, int flags)
 {
-    mmap_mutex.lock();
+    lock_retainer guard{mmap_mutex};
+
     if (!(flags & (1 << MAP_ANONYMOUS))) {
         // No support for shared mmap yet
         todo("Add support for MAP_SHARED\n");
-        mmap_mutex.unlock();
         return;
     }
 
     if (!virt) {
         // Can't yet find free virtual space
         todo("Find free virtual addresses");
-        mmap_mutex.unlock();
         return;
     }
 
@@ -39,19 +38,16 @@ void mmap(mm::vmm::aspace* space, uint64_t sz, void* virt, void* phys, int prot,
             space->map(nphys, nvirt, map_flags);
         }
     }
-
-    mmap_mutex.unlock();
 }
 
 void munmap(mm::vmm::aspace* space, void* addr, uint64_t len)
 {
-    mmap_mutex.lock();
+    lock_retainer guard{mmap_mutex};
     mm::pmm::free(addr, len);
 
     uint64_t nvirt = (uint64_t)addr;
     for (uint64_t d = 0; d < ROUND_UP(len, PAGE_SIZE); d++, nvirt += PAGE_SIZE) {
         space->unmap(nvirt);
     }
-
-    mmap_mutex.unlock();
 }
+
