@@ -1,4 +1,4 @@
-#include <internal/builtin.h>
+#include <klib/builtin.h>
 #include <internal/stivale2.h>
 #include <mrk/arch.h>
 #include <mrk/pmm.h>
@@ -22,7 +22,7 @@ public:
     {
         map = (uint8_t*)mp;
         map_size = mz;
-        _memset((uint64_t)mp, 0, map_size);
+        memset(mp, 0, map_size);
     }
     void* get_ptr() { return (void*)map; }
     bool is_free(uint64_t addr, uint64_t pages)

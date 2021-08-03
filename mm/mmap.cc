@@ -1,4 +1,4 @@
-#include <internal/builtin.h>
+#include <klib/builtin.h>
 #include <internal/lock.h>
 #include <mrk/log.h>
 #include <mrk/mmap.h>

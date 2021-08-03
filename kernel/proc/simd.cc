@@ -1,4 +1,4 @@
-#include <internal/builtin.h>
+#include <klib/builtin.h>
 #include <mrk/arch.h>
 #include <mrk/cpu.h>
 #include <mrk/log.h>

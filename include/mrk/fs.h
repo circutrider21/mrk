@@ -105,7 +105,7 @@ struct filesystem {
 
 void init();
 fs::node* create_node(fs::node* parent, const char* name, bool deep = false);
-fs::node* mkdir(fs::node* parent, const char* name, uint32_t mode, bool do_loop);
+fs::node* mkdir(fs::node* parent, const char* name, uint32_t mode, bool recurse);
 fs::inode* open(fs::node** dir, fs::node* parent, const char* path, int oflags, uint32_t mode);
 bool symlink(fs::node* parent, const char* target, const char* path);
 bool mount(const char* source, const char* target, const char* fs_type);

@@ -1,6 +1,6 @@
-#include <internal/builtin.h>
 #include <internal/stivale2.h>
 #include <internal/lock.h>
+#include <klib/builtin.h>
 
 #include <mrk/arch.h>
 #include <mrk/cpu.h>

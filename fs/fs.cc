@@ -1,4 +1,4 @@
-#include <internal/builtin.h>
+#include <klib/builtin.h>
 #include <internal/stivale2.h>
 #include <klib/vector.h>
 #include <mrk/fs.h>
@@ -15,16 +15,13 @@ bool fs::register_filesystem(fs::filesystem* fs)
 
 fs::filesystem* fs::get_filesystem(const char* fs_name)
 {
-   /*
     for (auto e : (*filesystems)) {
-        if (_memcmp(e->name, fs_name, 5) == 0)
+        if (!_strcmp(e->name, fs_name))
             return e;
     }
 
     log("fs: Filesystem %s does not exist or is not yet registered!\n", fs_name);
     return nullptr;
-    */
-    return (*filesystems)[0];
 }
 
 struct ustar_header {
@@ -74,16 +71,11 @@ static uint64_t octal_to_int(const char* s)
 void fs::init()
 {
     filesystems = new klib::vector<fs::filesystem*>();
-    fs_root = new fs::node();
-    *fs_root = { 0 };
-    fs_root->name[0] = '/';
 
     fs::register_filesystem(&tmpfs);
     bool data = fs::mount("tmpfs", "/", "tmpfs");
     if(!data)
 	PANIC("Unable to mount tmpfs\n");
-
-    log("mounted!\n");
 
     // Mount the initramfs
     stivale2_struct_tag_modules* modules_tag = (stivale2_struct_tag_modules*)arch::stivale2_get_tag(STIVALE2_STRUCT_TAG_MODULES_ID);

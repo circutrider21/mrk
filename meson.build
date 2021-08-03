@@ -26,6 +26,7 @@ kernel_sources = files(
     'kernel/lock.cc',
 
     'lib/klib/alloc.c',
+    'lib/klib/builtin.cc',
 )
 
 include_dirs = include_directories(['include', 'include/lib'])

@@ -1,4 +1,4 @@
-#include <internal/builtin.h>
+#include <klib/builtin.h>
 #include <internal/lock.h>
 #include <mrk/alloc.h>
 #include <mrk/fs.h>
@@ -21,7 +21,7 @@ static int64_t tmpfs_read(fs::inode* _this, void* buf, int64_t off, size_t count
     if (off + count > (size_t)self->st_size)
         count -= (off + count) - self->st_size;
 
-    _memcpy(self->data + off, buf, count);
+    _memcpy(buf, self->data + off, count);
 
     return count;
 }
@@ -38,7 +38,7 @@ static int64_t tmpfs_write(fs::inode* _this, const void* buf, int64_t off, size_
         self->data = (char*)mm::ralloc(self->data, self->allocated_size);
     }
 
-    _memcpy(buf, self->data + off, count);
+    _memcpy(self->data + off, buf, count);
 
     self->st_size += count;
     return count;
@@ -119,8 +119,6 @@ static fs::node* tmpfs_mount(fs::inode* device)
     res->grow = &tmpfs_grow;
 
     mount_gate->res = res;
-    log("%x\n", mount_gate);
-
     return mount_gate;
 }
 
@@ -173,3 +171,4 @@ fs::filesystem tmpfs = {
     .symlink = tmpfs_symlink,
     .mkdir = tmpfs_mkdir
 };
+

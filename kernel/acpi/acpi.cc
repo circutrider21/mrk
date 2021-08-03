@@ -1,5 +1,5 @@
 #include <cstddef>
-#include <internal/builtin.h>
+#include <klib/builtin.h>
 #include <internal/stivale2.h>
 #include <klib/vector.h>
 #include <mrk/acpi.h>

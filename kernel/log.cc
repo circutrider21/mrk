@@ -108,7 +108,7 @@ void log(char* fmt, ...)
     va_list v;
     va_start(v, fmt);
 
-    lock_retainer rk{log_mutex};
+    // lock_retainer rk{log_mutex};
     vprintf(fmt, v);
 
     va_end(v);
