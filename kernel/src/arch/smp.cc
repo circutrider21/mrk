@@ -33,7 +33,7 @@ static void init_ap(struct stivale2_smp_info* blog)
     kgdt.init();
     arch::idt::init();
 
-    arch::init_apic();
+    arch::apic::init();
 
     smp_lock.unlock();
 
@@ -50,6 +50,7 @@ static void init_local(int cpu_num)
 {
     cpu_info* cf = &cpu_locals[cpu_num];
     cf->errno = 1; // Start with no errors
+    cf->timeslice = 20000;
 
     cf->cpu_number = cpu_num;
 }

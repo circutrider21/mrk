@@ -141,16 +141,17 @@ extern "C" uint64_t handle_isr(uint64_t sp)
 
     if (handlers[n].callback) {
         handlers[n].callback(registers, handlers[n].userptr);
-        // log("x64/idt: Arrived!\n");
     }
 
     if (handlers[n].is_irq)
-        arch::eoi();
+        arch::apic::eoi();
 
     if (!handlers[n].should_iret && !handlers[n].is_irq)
         asm volatile("cli; hlt");
 
-    // log("RSP: %x, CS: %x, RDI %x\n", registers->rsp, registers->cs, registers->rdi);
+    if(handlers[n].is_timer)
+	cur_cpu->apc->timer_oneshot(cur_cpu->timeslice);
+
     return sp;
 }
 }

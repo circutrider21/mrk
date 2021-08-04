@@ -24,7 +24,6 @@ void* __gxx_personality_v0 = 0;
 void* _Unwind_Resume = 0;
 
 // The stivale2 tags...
-//
 static struct stivale2_header_tag_smp smp_hdr_tag = {
     .tag = {
         .identifier = STIVALE2_HEADER_TAG_SMP_ID,
@@ -108,11 +107,13 @@ void _start(struct stivale2_struct* stivale2_struct)
 
     arch::init_pit();
 
-    arch::init_apic();
+    smp::init_others();
+    arch::apic::init();
     arch::cpu::init();
 
     acpi::init();
-    smp::init_others();
+
+    log("init: kernel startup is now complete, halting...\n");
 
     // ADD CODE TO kernel_thread, NOT HERE!
     asm volatile("sti");

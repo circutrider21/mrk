@@ -81,7 +81,7 @@ public:
     uint16_t vector;
     idt_func callback;
     void* userptr = nullptr;
-    bool is_irq = false, should_iret = false;
+    bool is_irq = false, should_iret = false, is_timer = false;
 };
 
 void register_handler(callback h);

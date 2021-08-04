@@ -22,14 +22,14 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Configure
-      run: pip3 install meson ninja && sudo apt install nasm clang && CXX=clang++ CC=clang CXX_LD=lld meson setup -Dbuildtype=${{env.BUILD_TYPE}} build
+      run: pip3 install meson ninja && sudo apt install nasm clang-11 && cd kernel && CXX=clang++ CC=clang CXX_LD=lld meson setup -Dbuildtype=${{env.BUILD_TYPE}} build
 
     - name: Build
       # Build your program with the given configuration
       run: ninja -C build && git submodule init && git submodule update
 
     - name: Bundle
-      run: strip build/mrk.elf && ./tools/bundle_iso.sh build
+      run: strip build/mrk.elf && ../tools/bundle_iso.sh build ..
       
     - name: Distribute
       uses: actions/upload-artifact@v2.2.4
@@ -37,4 +37,4 @@ jobs:
         # Artifact name
         name: Beta ISO
         # A file, directory or wildcard pattern that describes what to upload
-        path: build/mrk-image.iso 
+        path: kernel/build/mrk-image.iso 
