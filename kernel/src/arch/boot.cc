@@ -1,21 +1,21 @@
-#include <internal/stivale2.h>
-#include <mrk/alloc.h>
-#include <mrk/apic.h>
-#include <mrk/arch.h>
-#include <mrk/cpu.h>
-#include <mrk/fs.h>
-#include <mrk/idt.h>
-#include <mrk/pmm.h>
-#include <mrk/proc.h>
-#include <mrk/smp.h>
-#include <mrk/vmm.h>
-
 #include <cstddef>
+#include <klib/builtin.h>
+#include <internal/stivale2.h>
 #include <internal/version.h>
+
+#include <arch/apic.h>
+#include <arch/arch.h>
+#include <arch/cpu.h>
+#include <arch/idt.h>
+#include <arch/smp.h>
+
+#include <mrk/pmm.h>
+#include <mrk/vmm.h>
+#include <mrk/alloc.h>
 #include <mrk/acpi.h>
 #include <mrk/log.h>
 
-static uint8_t _stack[8192] = {0};
+static uint8_t _stack[8192];
 void (*term_write)(const char* string, size_t length);
 static struct stivale2_struct* bootlog;
 
@@ -23,6 +23,8 @@ static struct stivale2_struct* bootlog;
 void* __gxx_personality_v0 = 0;
 void* _Unwind_Resume = 0;
 
+// The stivale2 tags...
+//
 static struct stivale2_header_tag_smp smp_hdr_tag = {
     .tag = {
         .identifier = STIVALE2_HEADER_TAG_SMP_ID,
@@ -69,17 +71,6 @@ void* stivale2_get_tag(uint64_t id)
 }
 }
 
-/*
-static void kernel_thread()
-{
-    log("Init Thread says hello!\n");
-
-    asm volatile("sti");
-    for (;;)
-        ;
-}
-*/
-
 void _start(struct stivale2_struct* stivale2_struct)
 {
     bootlog = stivale2_struct;
@@ -88,9 +79,7 @@ void _start(struct stivale2_struct* stivale2_struct)
     term_str_tag = (struct stivale2_struct_tag_terminal*)arch::stivale2_get_tag(STIVALE2_STRUCT_TAG_TERMINAL_ID);
 
     if (term_str_tag == nullptr) {
-        for (;;) {
-            asm("hlt");
-        }
+        PANIC("stivale2 terminal tag not found!\n");
     }
 
     void* term_write_ptr = (void*)term_str_tag->term_write;
@@ -120,15 +109,10 @@ void _start(struct stivale2_struct* stivale2_struct)
     arch::init_pit();
 
     arch::init_apic();
-    arch::sleep(30000000);
     arch::cpu::init();
 
     acpi::init();
-    fs::init();
     smp::init_others();
-    // proc::init();
-
-    // proc::create_thread(nullptr, kproc, (void*)&kernel_thread, nullptr, true, nullptr);
 
     // ADD CODE TO kernel_thread, NOT HERE!
     asm volatile("sti");
@@ -144,3 +128,4 @@ __attribute__((section(".stivale2hdr"), used)) static struct stivale2_header sti
     .flags = (1 << 1),
     .tags = (uintptr_t)&framebuffer_hdr_tag
 };
+

@@ -5,7 +5,7 @@
 // Defined in arch/funcs.asm
 extern "C" void __spinlock_lock(uint16_t* lk);
 extern "C" void __spinlock_unlock(uint16_t* lk);
-extern "C" void __spinlock_try(uint16_t* lk);
+extern "C" bool __spinlock_try(uint16_t* lk);
 
 void mutex::lock()
 {
@@ -40,7 +40,7 @@ void spinlock::unlock()
 
 bool spinlock::try_lock()
 {
-    __spinlock_try(&_lock);
+    return __spinlock_try(&_lock);
 }
 
 // Various things required by the compiler

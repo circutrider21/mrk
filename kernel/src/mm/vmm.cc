@@ -1,15 +1,15 @@
+#include <cstddef>
+
 #include <internal/stivale2.h>
 #include <internal/lock.h>
 #include <klib/builtin.h>
 
-#include <mrk/arch.h>
-#include <mrk/cpu.h>
-#include <mrk/idt.h>
+#include <arch/arch.h>
+#include <arch/cpu.h>
+#include <arch/idt.h>
 #include <mrk/log.h>
 #include <mrk/pmm.h>
 #include <mrk/vmm.h>
-
-#include <cstddef>
 
 #define GETMASK(index, size) ((((size_t)1 << (size)) - 1) << (index))
 #define WRITETO(data, index, size, value)             \

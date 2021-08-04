@@ -1,7 +1,6 @@
 #pragma once
 
-#include <mrk/cpu.h>
-#include <mrk/proc.h>
+#include <arch/cpu.h>
 
 namespace arch::cpu {
 class cpu_info {
@@ -9,10 +8,7 @@ public:
     uint64_t kernel_stack;
     uint64_t user_stack;
     uint64_t errno;
-    uint64_t stac_supported;
     int cpu_number;
-    proc::thread* current_thread;
-    int64_t queue_index;
 
     void store() { arch::cpu::wrmsr(0xC0000102, (uint64_t)this); }
 };

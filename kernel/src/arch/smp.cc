@@ -1,15 +1,16 @@
-#include <internal/stivale2.h>
-#include <mrk/apic.h>
-#include <mrk/arch.h>
-#include <mrk/idt.h>
-#include <mrk/pmm.h>
-#include <mrk/smp.h>
-#include <mrk/vmm.h>
-
 #include <cstddef>
-#include <mrk/alloc.h>
+#include <internal/stivale2.h>
 #include <internal/lock.h>
 #include <internal/atomic.h>
+
+#include <arch/apic.h>
+#include <arch/arch.h>
+#include <arch/idt.h>
+#include <arch/smp.h>
+
+#include <mrk/pmm.h>
+#include <mrk/vmm.h>
+#include <mrk/alloc.h>
 #include <mrk/log.h>
 
 using namespace arch::cpu;
@@ -48,9 +49,6 @@ static void init_ap(struct stivale2_smp_info* blog)
 static void init_local(int cpu_num)
 {
     cpu_info* cf = &cpu_locals[cpu_num];
-    cf->stac_supported = 0;
-    cf->current_thread = nullptr;
-    cf->queue_index = -1;
     cf->errno = 1; // Start with no errors
 
     cf->cpu_number = cpu_num;

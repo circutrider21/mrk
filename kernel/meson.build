@@ -3,27 +3,23 @@ project('mrk', 'cpp', version: '0.1.0')
 add_languages('c')
 
 kernel_sources = files( 
-    'arch/apic.cc',
-    'arch/arch.cc',
-    'arch/boot.cc',
-    'arch/cpu.cc',
-    'arch/gdt.cc',
-    'arch/idt.cc',
-    'arch/smp.cc',
+    'src/arch/apic.cc',
+    'src/arch/arch.cc',
+    'src/arch/boot.cc',
+    'src/arch/cpu.cc',
+    'src/arch/gdt.cc',
+    'src/arch/idt.cc',
+    'src/arch/smp.cc',
 
-    'mm/pmm.cc',
-    'mm/vmm.cc',
-    'mm/alloc.cc',
-    'mm/mmap.cc',
+    'src/mm/pmm.cc',
+    'src/mm/vmm.cc',
+    'src/mm/alloc.cc',
+    'src/mm/mmap.cc',
 
-    'fs/fs.cc',
-    'fs/node.cc',
-    'fs/tmpfs.cc',
-
-    'kernel/acpi/acpi.cc',
-    'kernel/proc/simd.cc',
-    'kernel/log.cc',
-    'kernel/lock.cc',
+    'src/acpi.cc',
+    'src/proc/simd.cc',
+    'src/log.cc',
+    'src/lock.cc',
 
     'lib/klib/alloc.c',
     'lib/klib/builtin.cc',
@@ -32,9 +28,9 @@ kernel_sources = files(
 include_dirs = include_directories(['include', 'include/lib'])
 
 kernel_asm_sources = files(
-    'arch/intr.asm',
-    'arch/funcs.asm',
-    'kernel/proc/syscall.asm'
+    'src/arch/intr.asm',
+    'src/arch/funcs.asm',
+    'src/proc/syscall.asm'
 )
 
 # Compile the asm files with a simple trick
@@ -53,13 +49,15 @@ cpp_flags += ['-std=c++17', '-fno-exceptions', '-fno-rtti']
 # Disable some pesky c++ warnings
 cpp_flags += ['-Wno-inline-new-delete', '-Wno-write-strings']
 
-linkscript = meson.current_source_dir() + '/misc/kernel.ld'
+linkscript = meson.current_source_dir() + '/../misc/kernel.ld'
 ld_flags = ['-T', linkscript, '-nostdlib', '-mcmodel=kernel', '-fno-PIC', '-no-pie', '-Wl,--build-id=none', 
             '-Wl,-z,max-page-size=0x1000,-n', '-lgcc']
 
 add_global_arguments(flags_c_common, language: 'c')
 
-if get_option('enable_ubsan')
+# UBSAN is only supported with GCC since Clang needs some extra things to get it working
+message(meson.get_compiler('cpp').get_id())
+if get_option('enable_ubsan') 
     flags_c_common +=  ['-fsanitize=undefined']
     kernel_sources += ['kernel/ubsan.cc']
 endif

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mrk/idt.h>
+#include <arch/idt.h>
 
 #define readcr(cr, n) asm volatile("mov %%" cr ", %%rax;" \
                                    "mov %%rax, %0 "       \
@@ -74,3 +74,26 @@ private:
 };
 
 extern gdt kgdt;
+
+// ====================================
+//        SIMD Support and Decls
+// ====================================
+
+#define CPUID_XSAVE 0x04000000
+#define CPUID_FXSAVE 0x01000000
+
+namespace arch::simd {
+void init();
+
+class state {
+public:
+    state();
+    ~state();
+    void save();
+    void restore();
+
+private:
+    uint8_t* data;
+};
+}
+

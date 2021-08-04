@@ -1,8 +1,8 @@
 #include <klib/builtin.h>
-#include <mrk/arch.h>
-#include <mrk/cpu.h>
+#include <arch/arch.h>
+#include <arch/cpu.h>
 #include <mrk/log.h>
-#include <mrk/proc.h>
+#include <mrk/alloc.h>
 
 extern "C" void asm_xsave(uint8_t* state);
 extern "C" void asm_xrstor(uint8_t* state);
@@ -82,10 +82,6 @@ void init()
         log("x64/fpu: Using FXSAVE for SIMD State Control (Size: 512)\n");
     } else {
         PANIC("x64/fpu: No SIMD Support!\n");
-        asm volatile("cli");
-        for (;;) {
-            asm volatile("hlt");
-        }
     }
 }
 

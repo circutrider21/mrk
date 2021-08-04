@@ -1,7 +1,7 @@
-#include <mrk/apic.h>
-#include <mrk/arch.h>
-#include <mrk/cpu.h>
-#include <mrk/idt.h>
+#include <arch/apic.h>
+#include <arch/arch.h>
+#include <arch/cpu.h>
+#include <arch/idt.h>
 #include <mrk/log.h>
 #include <mrk/pmm.h>
 #include <mrk/vmm.h>

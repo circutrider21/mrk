@@ -1,5 +1,5 @@
 #include <cstdint>
-#include <mrk/cpu.h>
+#include <arch/cpu.h>
 #include <mrk/log.h>
 
 uint64_t arch::cpu::rdmsr(uint32_t msr)

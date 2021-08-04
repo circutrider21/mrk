@@ -1,7 +1,7 @@
-#include <mrk/apic.h>
-#include <mrk/idt.h>
+#include <arch/apic.h>
+#include <arch/idt.h>
+#include <arch/smp.h>
 #include <mrk/log.h>
-#include <mrk/smp.h>
 
 static arch::idt::IDT kidt;
 static arch::idt::IDTR kidtr;

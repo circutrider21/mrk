@@ -1,4 +1,4 @@
-#include <mrk/cpu.h>
+#include <arch/cpu.h>
 
 gdt kgdt;
 
@@ -19,3 +19,4 @@ void gdt::init()
 extern "C" void __lgdt(void* ptr);
 
 void gdtr::load() { __lgdt((void*)this); }
+

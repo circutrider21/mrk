@@ -1,10 +1,9 @@
-#include <mrk/arch.h>
-#include <internal/lock.h>
-#include <mrk/log.h>
-
-#include <cstdbool>
 #include <cstddef>
 #include <cstdint>
+
+#include <internal/lock.h>
+#include <arch/arch.h>
+#include <mrk/log.h>
 
 // ring buffer for kernel log
 static uint8_t log_buff[KLOG_BUFF_LEN];
