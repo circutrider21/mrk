@@ -16,8 +16,9 @@ kernel_sources = files(
     'src/mm/alloc.cc',
     'src/mm/mmap.cc',
 
-    'src/acpi.cc',
     'src/proc/simd.cc',
+    'src/proc/sched.cc',
+    'src/acpi.cc',
     'src/log.cc',
     'src/lock.cc',
 

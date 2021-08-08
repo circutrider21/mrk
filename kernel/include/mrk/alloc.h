@@ -16,4 +16,3 @@ __attribute__((always_inline)) inline void* operator new([[maybe_unused]] size_t
 
 __attribute__((always_inline)) inline void operator delete(void* obj) { kfree(obj); }
 __attribute__((always_inline)) inline void operator delete(void* obj, size_t) { kfree(obj); }
-

@@ -1,7 +1,7 @@
 #include <cstddef>
-#include <klib/builtin.h>
 #include <internal/stivale2.h>
 #include <internal/version.h>
+#include <klib/builtin.h>
 
 #include <arch/apic.h>
 #include <arch/arch.h>
@@ -9,19 +9,16 @@
 #include <arch/idt.h>
 #include <arch/smp.h>
 
-#include <mrk/pmm.h>
-#include <mrk/vmm.h>
-#include <mrk/alloc.h>
 #include <mrk/acpi.h>
+#include <mrk/alloc.h>
 #include <mrk/log.h>
+#include <mrk/pmm.h>
+#include <mrk/proc.h>
+#include <mrk/vmm.h>
 
 static uint8_t _stack[8192];
 void (*term_write)(const char* string, size_t length);
 static struct stivale2_struct* bootlog;
-
-// Define these 2 variables to get rid of stack unwinding errors
-void* __gxx_personality_v0 = 0;
-void* _Unwind_Resume = 0;
 
 // The stivale2 tags...
 static struct stivale2_header_tag_smp smp_hdr_tag = {
@@ -70,6 +67,29 @@ void* stivale2_get_tag(uint64_t id)
 }
 }
 
+static void init_thread(uint64_t magic)
+{
+    asm volatile("sti");
+    if (magic != 0xDEADBEEF)
+        PANIC("Invalid thread magic");
+
+    for (;;)
+        ;
+}
+
+static void boot_banner()
+{
+    log("Mrk Kernel (v%s) (Date: %s) ", MRK_VERSION, __DATE__);
+#if defined(__clang__)
+    log("(Clang v%d.%d.%d)\n", __clang_major__, __clang_minor__, __clang_patchlevel__);
+#else
+#if defined(__GNUC__)
+    log("(GCC v%d.%d.%d)\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+#endif
+#endif
+    log("Copyright (c) 2021 Yusuf M, All Rights Reserved.\n\n");
+}
+
 void _start(struct stivale2_struct* stivale2_struct)
 {
     bootlog = stivale2_struct;
@@ -85,15 +105,7 @@ void _start(struct stivale2_struct* stivale2_struct)
 
     term_write = (void (*)(const char*, size_t))term_write_ptr;
 
-    log("Mrk Kernel (v%s) (Date: %s) ", MRK_VERSION, MRK_BUILD_DATE);
-#if defined(__clang__)
-    log("(Clang v%d.%d.%d)\n", __clang_major__, __clang_minor__, __clang_patchlevel__);
-#else
-#if defined(__GNUC__)
-    log("(GCC v%d.%d.%d)\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
-#endif
-#endif
-    log("Copyright (c) 2021 Yusuf M, All Rights Reserved.\n\n");
+    boot_banner();
 
     mm::pmm::init();
 
@@ -113,9 +125,11 @@ void _start(struct stivale2_struct* stivale2_struct)
 
     acpi::init();
 
+    proc::init();
+    proc::create_kthread((uint64_t)&init_thread, 0xDEADBEEF, true);
     log("init: kernel startup is now complete, halting...\n");
 
-    // ADD CODE TO kernel_thread, NOT HERE!
+    // ADD CODE TO init_thread, NOT HERE!
     asm volatile("sti");
     for (;;)
         ;
@@ -129,4 +143,3 @@ __attribute__((section(".stivale2hdr"), used)) static struct stivale2_header sti
     .flags = (1 << 1),
     .tags = (uintptr_t)&framebuffer_hdr_tag
 };
-

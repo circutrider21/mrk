@@ -1,5 +1,5 @@
-#include <klib/builtin.h>
 #include <internal/lock.h>
+#include <klib/builtin.h>
 #include <mrk/log.h>
 
 // Defined in arch/funcs.asm
@@ -20,15 +20,15 @@ void mutex::unlock()
 
 bool mutex::try_lock()
 {
-    if(__sync_bool_compare_and_swap(&status, true, true)) {
+    if (__sync_bool_compare_and_swap(&status, true, true)) {
         this->lock();
-	return true;
+        return true;
     } else {
         return false;
     }
 }
 
-void spinlock::lock() 
+void spinlock::lock()
 {
     __spinlock_lock(&_lock);
 }
@@ -66,8 +66,5 @@ extern "C" void memset(uint64_t b, int c, int len)
 
 extern "C" void memcpy(uint64_t dest, uint64_t src, size_t len)
 {
-    asm("rep movsd"
-        :
-        : "S"((uint64_t)src), "D"((uint64_t)dest), "c"(len)
-        : "memory");
+    _memcpy((void*)dest, (void*)src, len);
 }

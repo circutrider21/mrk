@@ -1,8 +1,8 @@
 #include <cstddef>
 #include <cstdint>
 
-#include <internal/lock.h>
 #include <arch/arch.h>
+#include <internal/lock.h>
 #include <mrk/log.h>
 
 // ring buffer for kernel log
@@ -118,7 +118,7 @@ void _todo(char* file, int line, char* fmt, ...)
     va_list va;
     va_start(va, fmt);
 
-    lock_retainer rk{log_mutex};
+    lock_retainer rk { log_mutex };
 
     // Print todo header
     puts("TODO(");

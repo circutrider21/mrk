@@ -96,4 +96,3 @@ private:
     uint8_t* data;
 };
 }
-

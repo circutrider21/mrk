@@ -1,11 +1,11 @@
 #include <cstddef>
 #include <cstring>
-#include <klib/builtin.h>
 #include <internal/stivale2.h>
+#include <klib/builtin.h>
 
 #include <arch/arch.h>
-#include <mrk/pmm.h>
 #include <mrk/log.h>
+#include <mrk/pmm.h>
 
 // A Simple bitmap implentation
 class memory_bitmap {

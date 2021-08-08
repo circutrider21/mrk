@@ -1,5 +1,5 @@
-#include <cstddef>
 #include <arch/arch.h>
+#include <cstddef>
 #include <mrk/log.h>
 
 extern void (*term_write)(const char*, size_t length);

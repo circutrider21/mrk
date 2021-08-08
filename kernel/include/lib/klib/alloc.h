@@ -13,20 +13,16 @@
 
 /** @{ */
 
-
-
 // If we are told to not define our own size_t, then we skip the define.
 //#define _HAVE_UINTPTR_T
 //typedef	unsigned long	uintptr_t;
 
 //This lets you prefix malloc and friends
-#define PREFIX(func)		k ## func
+#define PREFIX(func) k##func
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
 
 /** This function is supposed to lock the memory data structures. It
  * could be as simple as disabling interrupts or acquiring a spinlock.
@@ -62,23 +58,17 @@ extern void* liballoc_alloc(size_t);
  *
  * \return 0 if the memory was successfully freed.
  */
-extern int liballoc_free(void*,size_t);
+extern int liballoc_free(void*, size_t);
 
-
-       
-
-extern void    *PREFIX(malloc)(size_t);				///< The standard function.
-extern void    *PREFIX(realloc)(void *, size_t);		///< The standard function.
-extern void    *PREFIX(calloc)(size_t, size_t);		///< The standard function.
-extern void     PREFIX(free)(void *);					///< The standard function.
-
+extern void* PREFIX(malloc)(size_t); ///< The standard function.
+extern void* PREFIX(realloc)(void*, size_t); ///< The standard function.
+extern void* PREFIX(calloc)(size_t, size_t); ///< The standard function.
+extern void PREFIX(free)(void*); ///< The standard function.
 
 #ifdef __cplusplus
 }
 #endif
 
-
 /** @} */
 
 #endif
-

@@ -19,4 +19,3 @@ void gdt::init()
 extern "C" void __lgdt(void* ptr);
 
 void gdtr::load() { __lgdt((void*)this); }
-

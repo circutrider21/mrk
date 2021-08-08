@@ -3,6 +3,8 @@
 #include <arch/smp.h>
 #include <mrk/log.h>
 
+using namespace arch::cpu;
+
 static arch::idt::IDT kidt;
 static arch::idt::IDTR kidtr;
 
@@ -149,8 +151,8 @@ extern "C" uint64_t handle_isr(uint64_t sp)
     if (!handlers[n].should_iret && !handlers[n].is_irq)
         asm volatile("cli; hlt");
 
-    if(handlers[n].is_timer)
-	cur_cpu->apc->timer_oneshot(cur_cpu->timeslice);
+    if (handlers[n].is_timer)
+        cur_cpu->apc->timer_oneshot(cur_cpu->timeslice);
 
     return sp;
 }

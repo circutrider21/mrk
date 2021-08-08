@@ -14,7 +14,7 @@ void _memset(uint64_t b, int c, int len)
 
 int _strcmp(const char* s1, const char* s2)
 {
-    for (size_t i = 0; ; i++) {
+    for (size_t i = 0;; i++) {
         char c1 = s1[i], c2 = s2[i];
         if (c1 != c2)
             return c1 - c2;
@@ -25,8 +25,8 @@ int _strcmp(const char* s1, const char* s2)
 
 int _memcmp(const void* s1, const void* s2, size_t n)
 {
-    const uint8_t *p1 = (const uint8_t *)s1;
-    const uint8_t *p2 = (const uint8_t *)s2;
+    const uint8_t* p1 = (const uint8_t*)s1;
+    const uint8_t* p2 = (const uint8_t*)s2;
 
     for (size_t i = 0; i < n; i++) {
         if (p1[i] != p2[i])
@@ -45,10 +45,13 @@ size_t _strlen(const char* str)
 
 void _memcpy(void* dest, const void* src, size_t count)
 {
-    asm volatile ("rep movsd"
-		  :
-		  : "S"((uint64_t)src), "D"((uint64_t)dest), "c"(count)
-		  : "memory");
+    const uint8_t* p1 = (const uint8_t*)dest;
+    uint8_t* p2 = (uint8_t*)src;
+
+    for (size_t i = 0; i < count; i++)
+        p2[i] = p1[i];
+
+    return;
 }
 
 char* _strcpy(char* dest, const char* src)
@@ -62,4 +65,3 @@ char* _strcpy(char* dest, const char* src)
 
     return dest;
 }
-

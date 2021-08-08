@@ -23,5 +23,5 @@ fi
 
 ninja -C $1
 $2/tools/bundle_iso.sh $1 $2 &> /dev/null
-qemu-system-x86_64 --enable-kvm -cpu host,+invtsc -m 2G -M q35 -cdrom $1/mrk-image.iso -debugcon stdio -s
+qemu-system-x86_64 -d cpu_reset -D $1/log.txt --enable-kvm -cpu host,+invtsc -m 2G -M q35 -cdrom $1/mrk-image.iso -debugcon stdio -s
 

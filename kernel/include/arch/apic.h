@@ -2,9 +2,9 @@
 
 #include <cstdint>
 
-#define IA32_APIC         0x1B
-#define IA32_X2APIC_BASE  0x800
-#define LAPIC_TIMER_IRQ   32
+#define IA32_APIC 0x1B
+#define IA32_X2APIC_BASE 0x800
+#define LAPIC_TIMER_IRQ 32
 #define IA32_TSC_DEADLINE 0x6e0
 
 namespace arch::apic {
@@ -23,6 +23,7 @@ class xapic {
 
     uint64_t read(uint32_t reg);
     void write(uint32_t reg, uint64_t val);
+
 public:
     xapic();
     void eoi() { this->write(lapic_eoi, 0); }
@@ -39,4 +40,3 @@ void eoi();
 void ipi(uint8_t lapic_id, uint8_t vec);
 void ipi(xapic* apc, uint8_t vec);
 }
-

@@ -1,17 +1,17 @@
 #include <cstddef>
-#include <internal/stivale2.h>
-#include <internal/lock.h>
 #include <internal/atomic.h>
+#include <internal/lock.h>
+#include <internal/stivale2.h>
 
 #include <arch/apic.h>
 #include <arch/arch.h>
 #include <arch/idt.h>
 #include <arch/smp.h>
 
-#include <mrk/pmm.h>
-#include <mrk/vmm.h>
 #include <mrk/alloc.h>
 #include <mrk/log.h>
+#include <mrk/pmm.h>
+#include <mrk/vmm.h>
 
 using namespace arch::cpu;
 using namespace arch::idt;
@@ -50,7 +50,7 @@ static void init_local(int cpu_num)
 {
     cpu_info* cf = &cpu_locals[cpu_num];
     cf->errno = 1; // Start with no errors
-    cf->timeslice = 20000;
+    cf->timeslice = 2000;
 
     cf->cpu_number = cpu_num;
 }

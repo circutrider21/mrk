@@ -1,7 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include <internal/builtin.h>
+#include <klib/builtin.h>
+#include <mrk/log.h>
 #include <mrk/vmm.h>
 
 #define _DEFAULT_QUEUE_SIZE 10 // Default size of a queue
@@ -12,8 +13,8 @@ class queue {
 public:
     queue(uint32_t size = _DEFAULT_QUEUE_SIZE)
         : front(0)
-        , _count(0)
-        , rear(-1)
+        , rear(0)
+        , _count(-1)
     {
         _array = new T[size];
         _memset((uint64_t)_array, 0, (sizeof(T) * size)); // Clear Buffer

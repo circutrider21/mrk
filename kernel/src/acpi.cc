@@ -1,6 +1,6 @@
 #include <cstddef>
-#include <klib/builtin.h>
 #include <internal/stivale2.h>
+#include <klib/builtin.h>
 #include <klib/vector.h>
 #include <mrk/acpi.h>
 #include <mrk/log.h>

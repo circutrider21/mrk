@@ -1,7 +1,7 @@
 #include <cstddef>
 
-#include <internal/stivale2.h>
 #include <internal/lock.h>
+#include <internal/stivale2.h>
 #include <klib/builtin.h>
 
 #include <arch/arch.h>
@@ -509,7 +509,7 @@ uint64_t alloc()
     uint64_t lru_pcid;
     uint64_t use_pcid = ~0ull;
 
-    lock_retainer guard{vmm_lock};
+    lock_retainer guard { vmm_lock };
 
     for (cur_pcid = 0; cur_pcid < 16; cur_pcid++) {
 
@@ -527,8 +527,8 @@ uint64_t alloc()
 
 void free(uint64_t id)
 {
-    lock_retainer guard{vmm_lock};
-    
+    lock_retainer guard { vmm_lock };
+
     pcid_cache[id]--;
 }
 
@@ -656,7 +656,7 @@ void free(uint8_t key, bool supervisor)
 namespace mm::vmm {
 void check_and_init(bool bsp)
 {
-    lock_retainer guard{vmm_lock};
+    lock_retainer guard { vmm_lock };
 
     uint32_t eax, ebx, ecx, edx;
     arch::cpuid(1, eax, ebx, ecx, edx);
