@@ -66,5 +66,5 @@ endif
 add_global_arguments(cpp_flags, language: 'cpp')
 add_global_link_arguments(ld_flags, language: 'cpp')
 
-executable('mrk.elf', kernel_sources, nasm_objects, include_directories: include_dirs, install: true, link_depends: linkscript)
+executable('mrk.elf', kernel_sources, nasm_objects, include_directories: include_dirs, install: true, install_dir: 'boot', link_depends: linkscript)
 

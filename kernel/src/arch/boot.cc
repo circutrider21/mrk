@@ -69,7 +69,8 @@ void* stivale2_get_tag(uint64_t id)
 
 static void init_thread(uint64_t magic)
 {
-    asm volatile("sti");
+    log("init: kernel startup is now complete, halting...\n");
+    
     if (magic != 0xDEADBEEF)
         PANIC("Invalid thread magic");
 
@@ -127,7 +128,6 @@ void _start(struct stivale2_struct* stivale2_struct)
 
     proc::init();
     proc::create_kthread((uint64_t)&init_thread, 0xDEADBEEF, true);
-    log("init: kernel startup is now complete, halting...\n");
 
     // ADD CODE TO init_thread, NOT HERE!
     asm volatile("sti");
