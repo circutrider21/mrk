@@ -13,8 +13,8 @@ class queue {
 public:
     queue(uint32_t size = _DEFAULT_QUEUE_SIZE)
         : front(0)
-        , rear(0)
-        , _count(-1)
+        , _count(0)
+        , rear(-1)
     {
         _array = new T[size];
         _memset((uint64_t)_array, 0, (sizeof(T) * size)); // Clear Buffer
@@ -32,7 +32,7 @@ private:
     void grow_buffer();
     T* _array;
     uint32_t _capacity;
-    uint32_t front, rear, _count;
+    uint32_t _count, front, rear;
 };
 
 template <typename T>
