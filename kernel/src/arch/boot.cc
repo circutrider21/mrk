@@ -8,6 +8,7 @@
 #include <arch/cpu.h>
 #include <arch/idt.h>
 #include <arch/smp.h>
+#include <arch/hpet.h>
 
 #include <mrk/acpi.h>
 #include <mrk/alloc.h>
@@ -118,13 +119,12 @@ void _start(struct stivale2_struct* stivale2_struct)
     kgdt.init();
     arch::idt::init();
 
-    arch::init_pit();
+    acpi::init();
+    arch::hpet::init();
 
     smp::init_others();
     arch::apic::init();
     arch::cpu::init();
-
-    acpi::init();
 
     proc::init();
     proc::create_kthread((uint64_t)&init_thread, 0xDEADBEEF, true);

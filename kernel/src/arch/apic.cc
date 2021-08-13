@@ -1,4 +1,5 @@
 #include <arch/apic.h>
+#include <arch/hpet.h>
 #include <arch/arch.h>
 #include <arch/cpu.h>
 #include <arch/idt.h>
@@ -146,7 +147,7 @@ void callibrate_tsc(xapic* apc)
         uint64_t tsc_start = arch::rdtsc();
 
         // Wait 1 millisecond
-        arch::sleep(1);
+	arch::hpet::sleep(1000);
 
         uint64_t tsc_end = arch::rdtsc();
         uint64_t freq = (tsc_end - tsc_start) * 1000;

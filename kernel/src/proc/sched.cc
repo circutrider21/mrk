@@ -132,7 +132,7 @@ proc::thread* proc::create_kthread(uint64_t ip, uint64_t arg0, bool start)
         .tstate = proc::thread_state::READY,
         .prc = kernel_process,
         .kernel_stack = stack_ptr + MEM_VIRT_OFFSET,
-        .timeslice = 5000,
+        .timeslice = 20000,
     };
 
     thrd->context.cs = 0x08;

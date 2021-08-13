@@ -9,6 +9,7 @@ kernel_sources = files(
     'src/arch/cpu.cc',
     'src/arch/gdt.cc',
     'src/arch/idt.cc',
+    'src/arch/hpet.cc',
     'src/arch/smp.cc',
 
     'src/mm/pmm.cc',

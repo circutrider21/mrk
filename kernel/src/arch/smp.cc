@@ -50,7 +50,7 @@ static void init_local(int cpu_num)
 {
     cpu_info* cf = &cpu_locals[cpu_num];
     cf->errno = 1; // Start with no errors
-    cf->timeslice = 2000;
+    cf->timeslice = 20000;
 
     cf->cpu_number = cpu_num;
 }
@@ -76,9 +76,9 @@ void init_others()
         tag_smp->smp_info[i].target_stack = stack;
         tag_smp->smp_info[i].goto_address = (uint64_t)init_ap;
     }
-
+/*
     while (atomic_read<uint64_t>(active_cpus) != tag_smp->cpu_count)
-        ;
+        ; */
 }
 
 cpu_info* get(int index) { return &cpu_locals[index]; }

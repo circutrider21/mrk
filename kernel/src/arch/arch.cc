@@ -67,39 +67,3 @@ uint64_t rdtsc()
 }
 }
 
-// ====================================
-//               PIT Code
-// ====================================
-
-static uint32_t read_counter()
-{
-    __outb(PIT_MODE_COMMAND, 0);
-    uint32_t counter = __inb(PIT_DATA_PORT0);
-    counter |= __inb(PIT_DATA_PORT0) << 8;
-
-    return counter;
-}
-
-namespace arch {
-void init_pit()
-{
-    int freq_divisor = 1000;
-    uint16_t divisor = PIT_FREQUENCY / freq_divisor;
-
-    __outb(PIT_MODE_COMMAND, PIT_CHANNEL1 | PIT_LOWBYTE | PIT_SQUARE_WAVE);
-    __outb(PIT_DATA_PORT0, divisor & 0xFF);
-    __outb(PIT_DATA_PORT0, (divisor >> 8) & 0xFF);
-}
-
-void sleep(uint64_t ms)
-{
-    uint16_t wait_val = (ms);
-
-    __outb(PIT_MODE_COMMAND, PIT_CHANNEL1 | PIT_LOWBYTE);
-    __outb(PIT_DATA_PORT0, wait_val & 0xFF);
-    __outb(PIT_DATA_PORT0, (wait_val >> 8) & 0xFF);
-
-    while (!(read_counter() == 0))
-        ;
-}
-}
