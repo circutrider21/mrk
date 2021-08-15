@@ -1,2 +1,0 @@
-option('enable_ubsan', type: 'boolean', value: false)
-
