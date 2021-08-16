@@ -1,0 +1,14 @@
+[binaries]
+c = ['clang', '-target', 'aarch64-unknown-none-elf']
+c_ld = ['lld']
+cpp = ['clang++', '-target', 'aarch64-unknown-none-elf']
+ar = 'ar'
+strip = 'strip'
+pkgconfig = 'pkg-config'
+
+[host_machine]
+system = 'mrk'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+

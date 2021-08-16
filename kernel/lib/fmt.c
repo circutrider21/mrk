@@ -1,6 +1,7 @@
 #include <lib/fmt.h>
 #include <lib/builtins.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 static int fmt_putui(uint64_t val, char *buf, int size, uint8_t base, int width) {
 	static const char *digits = "0123456789abcdef";
