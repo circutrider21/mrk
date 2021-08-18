@@ -21,7 +21,7 @@ void initgraph_dump() {
 
     for(uint64_t i = 0; i < targets; i++) {
         initgraph_t cur_target = initgraph_get(i);
-	log("\t%s -> %d\n", cur_target.name, cur_target.pos);
+	log("  %s -> %d\n", cur_target.name, cur_target.pos);
     }
 }
 
