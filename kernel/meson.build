@@ -2,6 +2,7 @@ kernel_src = files(
     'lib/fmt.c',
     'lib/builtins.c',
 
+    'generic/init.c',
     'generic/log.c',
     'generic/initgraph.c',
     'generic/fbcon.c',

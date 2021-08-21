@@ -25,3 +25,17 @@ void initgraph_dump() {
     }
 }
 
+void initgraph_run() {
+    uint64_t targets = ((uint64_t)__initgraph_end - (uint64_t)__initgraph_start) / sizeof(initgraph_t);
+
+    for(uint64_t i = 0; i < targets; i++) {
+	initgraph_t cur_target = initgraph_get(i);
+	
+	// Check if this target was already ran
+	if(!(cur_target.flags & INITGRAPH_RAN)) {
+            cur_target.func();
+	    cur_target.flags |= INITGRAPH_RAN;
+	}
+    }
+}
+

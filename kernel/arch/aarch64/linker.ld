@@ -1,4 +1,4 @@
-ENTRY(mrk_start_aa64)
+ENTRY(mrk_entry)
 
 PHDRS {
   none   PT_NULL FLAGS(0);
@@ -33,7 +33,7 @@ SECTIONS {
     __initgraph_start = .;
     KEEP(*(.initgraph)) 
     __initgraph_end = .;
-  }:rodata
+  }:data
 
   . = ALIGN(64K);
   .data . : {

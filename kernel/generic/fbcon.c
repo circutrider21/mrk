@@ -34,6 +34,9 @@ void init_fbcon() {
     pitch = fb_tag->framebuffer_pitch;
 
     fbcon_clear();
+
+    // Mark that we have already been ran
+    fbcon.flags |= INITGRAPH_RAN;
 }
 
 static void put_px(uint32_t x, uint32_t y, uint32_t color) {

@@ -1,19 +1,21 @@
 #include <lib/stivale2.h>
-#include <generic/fbcon.h>
 #include <generic/initgraph.h>
+#include <generic/fbcon.h>
 #include <generic/log.h>
 
 // The stack is actually created inside the linker script, so import the symbols here.
 extern char __stack_high[];
-extern struct stivale2_struct_tag_mmio32_uart* mmio_struct;
-struct stivale2_struct* bootinfo;
+static struct stivale2_struct* bootinfo;
 
+#ifdef __aarch64__
+extern struct stivale2_struct_tag_mmio32_uart* mmio_struct;
+#endif
 
 // The stivale2 tags...
 static struct stivale2_header_tag_smp smp_hdr_tag = {
     .tag = {
         .identifier = STIVALE2_HEADER_TAG_SMP_ID,
-        .next = 0 
+        .next = 0
     },
     .flags = 0,
 };
@@ -53,18 +55,31 @@ void* stivale2_query(uint64_t id) {
     }
 }
 
-void mrk_start_aa64(struct stivale2_struct* stivale2_struct) {
+void mrk_entry(struct stivale2_struct* stivale2_struct) {
     bootinfo = stivale2_struct;
-    mmio_struct = (struct stivale2_struct_tag_mmio32_uart*)stivale2_query(0xb813f9b8dbc78797);
 
+#ifdef __aarch64__
+    mmio_struct = (struct stivale2_struct_tag_mmio32_uart*)stivale2_query(0xb813f9b8dbc78797);
     // Put a \n as a marker between sabaton's log and mrk's log
     *((volatile uint32_t*)mmio_struct->addr) = '\n';
+#endif
 
-    init_fbcon();
+    init_fbcon(); // The fbcon is manually init'ed even though its in the initgraph
     log("Hello from mrk!\n");
     initgraph_dump();
+    initgraph_run();
+    log("init: boot sequence complete, halting!\n");
 
+#ifdef __aarch64__
     asm volatile ("wfi");
     for(;;);
+#endif
+#ifdef __x86_64__
+    asm volatile ("cli");
+    asm volatile ("hlt");
+
+    // Just for safety
+    for(;;);
+#endif
 }
 

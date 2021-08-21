@@ -7,6 +7,7 @@ typedef struct {
     char* name;
     int pos;
     void (*func)();
+    uint32_t flags;
 } initgraph_t;
 
 #define INITGRAPH_TARGET(nam, p, fun)\
@@ -17,7 +18,10 @@ static initgraph_t nam = {\
     .func = fun,\
 };\
 
+#define INITGRAPH_RAN (1 << 0)
+
 void initgraph_dump();
+void initgraph_run();
 
 #endif // GENERIC_INITGRAPH_H
 
