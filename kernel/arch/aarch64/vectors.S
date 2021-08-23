@@ -146,14 +146,14 @@ vectors:
   make_entry	not_allowed			// FIQ
   make_entry	not_allowed			// Error
 
-// Just return for now...
+// Just chill for now...
 not_allowed:
   wfi
 
 make_handler    el1t_sync,  1, handle_intr 
 make_handler    el1t_irq,   1, handle_irq                    
 make_handler    el1t_fiq,   1, handle_irq                     
-make_handler    el1t_error, 1                     
+make_handler    el1t_error, 1, handle_intr                     
 
 make_handler    el1h_sync,  1, handle_intr                    
 make_handler    el1h_irq,   1, handle_irq                   

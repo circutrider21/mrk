@@ -131,7 +131,7 @@ static void putat(unsigned int x, unsigned int y, const char c) {
 	uintptr_t line = (uintptr_t)fb + y * 16 * (uint32_t)(pitch) + x * 8;
 	
 	for(size_t i = 0; i < 16; i++) {
-		uint32_t* dest = line;
+		uint32_t* dest = (uint32_t*)line;
 		uint8_t dc = (c >= 32 && c <= 127) ? c : 127;
 		char fontbits = font_bitmap[(dc - 32) * 16 + i];
 		

@@ -61,7 +61,7 @@ void mrk_entry(struct stivale2_struct* stivale2_struct) {
 #ifdef __aarch64__
     mmio_struct = (struct stivale2_struct_tag_mmio32_uart*)stivale2_query(0xb813f9b8dbc78797);
     // Put a \n as a marker between sabaton's log and mrk's log
-    *((volatile uint32_t*)mmio_struct->addr) = '\n';
+    debug_putc('\n');
 #endif
 
     init_fbcon(); // The fbcon is manually init'ed even though its in the initgraph
