@@ -1,0 +1,16 @@
+[book]
+authors = ["Yusuf M"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Mrk Kernel Documentation"
+
+[output.html]
+git-repository-url = "https://github.com/circutrider21/mrk"
+mathjax-support = true
+
+[output.html.search]
+enable = true
+limit-results = 20
+use-boolean-and = true
+
