@@ -1,6 +1,5 @@
 #include <generic/fbcon.h>
 #include <lib/stivale2.h>
-#include <generic/initgraph.h>
 
 #include <stdint.h>
 #include <stddef.h>
@@ -23,8 +22,6 @@ static const uint32_t color_table[16] = {
 static uint32_t fgcolor = TERM_LIGHT_WHITE;
 static uint32_t bgcolor = TERM_GREY;
 
-INITGRAPH_TARGET(fbcon, 0, &init_fbcon);
-
 void init_fbcon() {
     struct stivale2_struct_tag_framebuffer* fb_tag = stivale2_query(STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
     framebuffer = (volatile uint8_t*)fb_tag->framebuffer_addr;
@@ -34,9 +31,6 @@ void init_fbcon() {
     pitch = fb_tag->framebuffer_pitch;
 
     fbcon_clear();
-
-    // Mark that we have already been ran
-    fbcon.flags |= INITGRAPH_RAN;
 }
 
 static void put_px(uint32_t x, uint32_t y, uint32_t color) {

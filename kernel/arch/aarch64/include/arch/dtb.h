@@ -23,6 +23,10 @@ typedef struct {
     uint32_t len;
 } fdt_node;
 
+#define bswap_32(k) __builtin_bswap32(k)
+#define bswap_64(k) __builtin_bswap64(k)
+
+void init_dtb();
 fdt_node find_attrib(char* node_name, char* attrib_name);
 
 #endif // ARCH_DTB_H

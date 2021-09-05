@@ -4,8 +4,8 @@ kernel_src = files(
 
     'generic/init.c',
     'generic/log.c',
-    'generic/initgraph.c',
     'generic/fbcon.c',
+    'generic/acpi/acpi.c',
 )
 
 kflags = ['-ffreestanding', '-fPIC', '-fpie', '-mgeneral-regs-only', '-nostdlib', '-fno-stack-protector']

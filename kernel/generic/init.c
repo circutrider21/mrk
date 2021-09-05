@@ -1,7 +1,7 @@
 #include <lib/stivale2.h>
-#include <generic/initgraph.h>
 #include <generic/fbcon.h>
 #include <generic/log.h>
+#include <generic/acpi.h>
 
 // The stack is actually created inside the linker script, so import the symbols here.
 extern char __stack_high[];
@@ -66,8 +66,8 @@ void mrk_entry(struct stivale2_struct* stivale2_struct) {
 
     init_fbcon(); // The fbcon is manually init'ed even though its in the initgraph
     log("Hello from mrk!\n");
-    initgraph_dump();
-    initgraph_run();
+    arch_init_early();
+    init_acpi();
     log("init: boot sequence complete, halting!\n");
 
 #ifdef __aarch64__
