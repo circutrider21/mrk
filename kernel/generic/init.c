@@ -1,4 +1,5 @@
 #include <lib/stivale2.h>
+#include <vm/vm.h>
 #include <generic/fbcon.h>
 #include <generic/log.h>
 #include <generic/acpi.h>
@@ -68,6 +69,7 @@ void mrk_entry(struct stivale2_struct* stivale2_struct) {
     log("Hello from mrk!\n");
     arch_init_early();
     init_acpi();
+    vm_init();
     log("init: boot sequence complete, halting!\n");
 
 #ifdef __aarch64__

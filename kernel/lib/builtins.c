@@ -30,3 +30,8 @@ int memcmp(const void *s1, const void *s2, size_t n) {
     return 0;
 }
 
+void memset(void* data, const uint8_t value, const size_t n) {
+    for(size_t i = 0; i < n; i++)
+        ((uint8_t*)data)[i] = value;
+}
+
