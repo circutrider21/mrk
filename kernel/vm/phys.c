@@ -39,25 +39,29 @@ void* vm_phys_alloc(size_t pages, int flags) {
         return NULL;	    
 
     size_t i, j;
-    void* ret;
+    void* ret = NULL;
     for (i = 0; i < highest_addr / VM_PAGE_SIZE; i++) {
         for (j = 0; j < pages; j++) {
 	    if (bitmap_get(&map, i)) {
 	        break;
 	    } else if (j == pages - 1) {
 	        ret = (void*)(i * VM_PAGE_SIZE);
-		mark_pages(ret, pages);
-                goto out;
+		    mark_pages(ret, pages);
+            goto out;
 	    }
 	}
     }
 
 out:
-    if(flags & VM_PAGE_ZERO)
+    if(flags & VM_PAGE_ZERO && ret != NULL)
         memset(ret, 0, pages * VM_PAGE_SIZE);
 
-    log("vm/phys: Out Of Memory!\n");
-    return NULL;
+    if (ret == NULL) {
+        log("vm/phys: Out Of Memory!\n"); 
+        return NULL;
+    } else {
+        return ret;
+    }
 }
 
 void vm_phys_lock(void* addr, size_t pages) {

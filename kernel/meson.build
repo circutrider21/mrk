@@ -9,12 +9,13 @@ kernel_src = files(
     'generic/acpi/acpi.c',
 
     'vm/phys.c',
+    'vm/virtual.c',
     'vm/vm.c',
 )
 
-kflags = ['-ffreestanding', '-fPIC', '-mgeneral-regs-only', '-nostdlib', '-fno-stack-protector']
+kflags = ['-ffreestanding', '-mgeneral-regs-only', '-nostdlib', '-fno-stack-protector']
 
-ld_flags = ['-shared', '-pie', '-fPIC', '-nostdlib', '-Wl,--build-id=none', '-lgcc']
+ld_flags = ['-nostdlib', '--build-id=none']
 
 kernel_include_dirs = ['include']
 
@@ -24,6 +25,19 @@ elif host_machine.cpu_family() == 'x86_64'
     subdir('arch/x86_64')
 endif
 
-executable(kernel_name, kernel_src, link_args: ld_flags, include_directories: include_directories(kernel_include_dirs), 
-           c_args: kflags, install: true, install_dir: 'boot', link_depends: linker_file, pie: true)
+libkrnl = static_library('krnl', kernel_src, include_directories: include_directories(kernel_include_dirs), c_args: kflags, pic: true)
 
+# As of right now, we only support 2 linkers which are either GNU ld and LLVM lld
+if meson.get_compiler('c').get_id() == 'clang'
+    custom_target('kernel',
+            input: [libkrnl],
+            output: [kernel_name],
+            command: ['ld.lld', '-o', '@OUTPUT@', ld_flags, '@INPUT@'],
+            install: true, install_dir: 'boot')
+else
+    custom_target('kernel',
+            input: [libkrnl],
+            output: [kernel_name],
+            command: ['ld', '-o', '@OUTPUT@', ld_flags, '@INPUT@'],
+            install: true, install_dir: 'boot')
+endif

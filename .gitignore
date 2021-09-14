@@ -1,0 +1,9 @@
+# IDE Directories/Files
+.vscode
+.vimrc
+
+# Build Dirs
+out
+res
+dbg
+build
