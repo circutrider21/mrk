@@ -7,6 +7,9 @@
 #define VM_PERM_WRITE (1 << 1)
 #define VM_PERM_EXEC  (1 << 2)
 
+
+#define VM_HIGHERHALF_OFFSET 0xffffffff80000000
+
 typedef struct vm_aspace {
     uintptr_t root;
     uint32_t spid;
@@ -41,5 +44,7 @@ void vm_virt_modify(vm_aspace_t* space, uintptr_t virt, int flags, cache_type ct
 
 #define vm_v2p(s, v) ((uintptr_t)arch_translate_virt(s, v))
 void vm_virt_setup(vm_aspace_t* space);
+
+extern vm_aspace_t my_space;
 
 #endif // VM_VIRTUAL_H

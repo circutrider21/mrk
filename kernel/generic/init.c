@@ -3,6 +3,8 @@
 #include <generic/fbcon.h>
 #include <generic/log.h>
 #include <generic/acpi.h>
+#include <arch/arch.h>
+#include <arch/debug.h>
 
 // The stack is actually created inside the linker script, so import the symbols here.
 extern char __stack_high[];
@@ -70,6 +72,7 @@ void mrk_entry(struct stivale2_struct* stivale2_struct) {
     arch_init_early();
     init_acpi();
     vm_init();
+    arch_init();
     log("init: boot sequence complete, halting!\n");
 
 #ifdef __aarch64__

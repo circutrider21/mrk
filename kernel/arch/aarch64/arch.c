@@ -1,5 +1,7 @@
 #include <arch/arch.h>
 #include <arch/dtb.h>
+#include <arch/timer.h>
+#include <generic/log.h>
 
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
@@ -27,7 +29,7 @@ void arch_init_early() {
     
     asm volatile ("msr mair_el1, %0" :: "r" (new_mair));
 
-    auto ia = MIN((uint64_t)5, mmu_id0 & 0xF);
+    uint64_t r = MIN((uint64_t)5, mmu_id0 & 0xF);
 
     // Setup tcr
     uint64_t tcr1 =
@@ -39,9 +41,12 @@ void arch_init_early() {
 		(1 << 26) |               // TTBR1 Outer WB RW-Allocate
 		(2 << 12) |               // TTBR0 Inner shareable
 		(2 << 28) |               // TTBR1 Inner shareable
-		((uint64_t)ia << 32) |    // 48-bit intermediate address
+		(r << 32) |               // 48-bit intermediate address
 		(2 << 30);                // TTBR1 4K granule
     
     asm volatile ("msr tcr_el1, %0" :: "r" (tcr1));
 }
 
+void arch_init() {
+    timer_init();
+}

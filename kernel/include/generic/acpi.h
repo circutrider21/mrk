@@ -35,6 +35,7 @@ typedef struct {
 } __attribute__((packed)) acpi_rsdt;
 
 void init_acpi();
+void *acpi_query(const char *signature, int index);
 
 #endif // GENERIC_ACPI_H
 

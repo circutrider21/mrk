@@ -2,6 +2,7 @@ kernel_src = files(
     'lib/fmt.c',
     'lib/bitops.c',
     'lib/builtins.c',
+    'lib/alloc.c',
 
     'generic/init.c',
     'generic/log.c',
