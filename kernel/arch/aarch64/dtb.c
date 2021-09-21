@@ -6,13 +6,6 @@ static uint32_t* dtb_data;
 static uintptr_t dtb_size;
 static struct devicetree_header dtb_hdr;
 
-/*
-static uint32_t bswap_32(uint32_t num) {
-    uint8_t* real_num = (uint8_t*)&num;
-    return (real_num[0] << 24) | (real_num[1] << 16) | (real_num[2] << 8) | real_num[3];
-}
-*/
-
 void init_dtb() {
     struct stivale2_struct_tag_dtb* tag_dtb = stivale2_query(STIVALE2_STRUCT_TAG_DTB);
     dtb_data = (uint32_t*)tag_dtb->addr;

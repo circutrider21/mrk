@@ -1,5 +1,6 @@
 #include <generic/fbcon.h>
 #include <lib/stivale2.h>
+#include <vm/vm.h>
 
 #include <stdint.h>
 #include <stddef.h>
@@ -24,7 +25,7 @@ static uint32_t bgcolor = TERM_GREY;
 
 void init_fbcon() {
     struct stivale2_struct_tag_framebuffer* fb_tag = stivale2_query(STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
-    framebuffer = (volatile uint8_t*)fb_tag->framebuffer_addr;
+    framebuffer = (volatile uint8_t*)((uint64_t)fb_tag->framebuffer_addr + VM_MEM_OFFSET);
 
     width = fb_tag->framebuffer_width;
     height = fb_tag->framebuffer_height;

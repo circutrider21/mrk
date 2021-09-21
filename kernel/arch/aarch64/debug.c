@@ -1,12 +1,13 @@
 #include <arch/debug.h>
 #include <lib/stivale2.h>
 #include <generic/log.h>
+#include <vm/vm.h>
 
 struct stivale2_struct_tag_mmio32_uart* mmio_struct;
 
 void debug_putc(char c) {
     uint32_t write_val = (uint32_t)c;
-    uint32_t *mmio = (uint32_t *)mmio_struct->addr;
+    uint32_t *mmio = (uint32_t *)((uint64_t)mmio_struct->addr + VM_MEM_OFFSET);
     *((uint32_t*)mmio) = write_val;
 }
 

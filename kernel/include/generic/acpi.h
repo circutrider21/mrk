@@ -18,7 +18,7 @@ typedef struct {
 } __attribute__((packed)) acpi_rsdp;
 
 typedef struct {
-    char signature[4];
+    char sig[4];
     uint32_t length;
     uint8_t rev;
     uint8_t checksum;

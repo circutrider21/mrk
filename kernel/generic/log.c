@@ -6,7 +6,6 @@
 static char buf[512];
 
 static void log_puts(char* str, size_t bytes) {
-    // TODO: Implement fbcon
     fbcon_puts(str);
     for(size_t cnt = 0; cnt < bytes; cnt++) {
         debug_putc(str[cnt]);

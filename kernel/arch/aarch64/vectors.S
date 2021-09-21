@@ -25,9 +25,9 @@
 .endm
 
 .macro	popall
-        mov x0, sp
-        ldr x1, [x0, #8]
-        ldp x2, x3, [x0, #16]
+  mov x0, sp
+  ldr x1, [x0, #8]
+  ldp x2, x3, [x0, #16]
 	ldp x4, x5, [x0, #32]
 	ldp x6, x7, [x0, #48]
 	ldp x8, x9, [x0, #64]
@@ -125,19 +125,19 @@ vectors:
   make_entry	el1t_sync			// Synchronous
   make_entry	el1t_irq			// IRQ
   make_entry	el1t_fiq			// FIQ
-  make_entry	el1t_error			// Error
+  make_entry	el1t_error		// Error
 
-  // EL1 Interrupt with EL0.SP != EL1.SP
-  make_entry    el1h_sync			// Synchronous
+  // EL1 Interrupt with EL1.SP == EL1.SP
+  make_entry  el1h_sync	    // Synchronous
   make_entry	el1h_irq			// IRQ
   make_entry	el1h_fiq			// FIQ
-  make_entry	el1h_error			// Error
+  make_entry	el1h_error		// Error
 
   // EL0 Interrupt with cpu in Aarch64 mode
   make_entry	el0_sync			// Synchronous
-  make_entry	el0_irq			        // IRQ
-  make_entry	el0_fiq      		        // FIQ
-  make_entry    el0_error			// Error
+  make_entry	el0_irq			  // IRQ
+  make_entry	el0_fiq      	// FIQ
+  make_entry  el0_error			// Error
 
   // EL0 Interrupt with cpu in Aarch32 mode
   // NOTE: These Interrupts are ignored in the handler since mrk runs only pure aarch64 code

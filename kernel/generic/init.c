@@ -67,7 +67,7 @@ void mrk_entry(struct stivale2_struct* stivale2_struct) {
     debug_putc('\n');
 #endif
 
-    init_fbcon(); // The fbcon is manually init'ed even though its in the initgraph
+    init_fbcon();
     log("Hello from mrk!\n");
     arch_init_early();
     init_acpi();

@@ -1,6 +1,10 @@
 #include <vm/virtual.h>
 #include <vm/phys.h>
+#include <vm/vm.h>
 #include <lib/bitops.h>
+#include <generic/log.h>
+#include <arch/arch.h>
+#include <stdbool.h>
 
 #define TLBI_ENCODE(a, b) (((uint64_t)a << 48) | (b >> 12))
 #define DECODE_ADDR(addr, level) ((addr >> level) & 0x1ff)
@@ -18,9 +22,9 @@
 
 void arch_invl_addr(const void* addr, uint32_t spid) {
     asm volatile (
-            "dsb st;\n\t\
-		    tlbi vale1, %0;\n\t\
-	        dsb sy; isb"
+            "dsb ishst;\n\t\
+		     tlbi vae1is, %0;\n\t\
+	         dsb ish; isb"
 		   :
 		   : "r"(TLBI_ENCODE(spid, (uint64_t)addr))
 		   : "memory");
@@ -28,79 +32,66 @@ void arch_invl_addr(const void* addr, uint32_t spid) {
 
 void arch_invl_spid(uint32_t spid) {
     asm volatile (
-           "dsb st;\n\t\
-		   tlbi aside1, %0;\n\t\
-		   dsb sy; isb"
+            "dsb ishst;\n\t\
+		     tlbi aside1is, %0;\n\t\
+	         dsb ish; isb"
 		   :
-		   : "r"(TLBI_ENCODE(spid, 0))
+		   : "r"((uint64_t)(spid) << 48)
 		   : "memory");
 }
 
-static uint64_t* next_level(uint64_t* table, int spot) {
-    if (!(table[spot] & 1)) {
-        uint64_t* sp = (uint64_t*)vm_phys_alloc(1, VM_PAGE_ZERO);
-	    table[spot] = (uintptr_t)sp | (uint64_t)1 | PAGE_TABLE;
-	    return sp;
+static uint64_t* page_table_walk(bool create, uint64_t* table, uint16_t index) {
+    // log("vm/virt: page_table_walk(%s, 0x%p, %u)\n", create ? "true" : "false", table, index);
+    uint64_t pte = table[index];
+    if (!(pte & 1ull)) {
+        if (!create) {
+            return NULL;
+        }
+
+        uintptr_t table_ptr = (uintptr_t)vm_phys_alloc(1, VM_PAGE_ZERO);
+
+        table[index] = table_ptr | 0x3;
+        return (uint64_t*)table_ptr;
     } else {
-        return (uint64_t*)(table[spot] & 0xFFFFFFFFF000);
+        return (uint64_t*)(pte & 0xfffffffff000);
     }
 }
 
-void arch_map_4k(vm_aspace_t *spc, uintptr_t phys, uintptr_t virt, uint64_t flags, cache_type ca) {
-    // Make a few safety checks
-    if (!((virt % 0x1000) + (phys % 0x1000) == 0 && (((virt >> 63) & 1) == 1)))
-        return;
+void arch_map_4k(vm_aspace_t* space, uintptr_t phys, uintptr_t virt, uint64_t flags, cache_type ctype) {
+    uint16_t ttbr = (virt >> 63) & 1;
+    uint64_t* level0;
+
+    uint16_t level0_index = DECODE_ADDR(virt, 39);
+    uint16_t level1_index = DECODE_ADDR(virt, 30);
+    uint16_t level2_index = DECODE_ADDR(virt, 21);
+    uint16_t level3_index = DECODE_ADDR(virt, 12);
+
+    if (ttbr == 1) {
+        level0 = (uint64_t*)(space->kernel_root);
+    } else {
+        level0 = (uint64_t*)(space->root);
+    }
+
+    // log("vm: 0x%p 0x%p\n", level0, (uint64_t)level0 + VM_MEM_OFFSET);
+    uint64_t* level1 = page_table_walk(true, (uint64_t*)((uint64_t)level0 + VM_MEM_OFFSET), level0_index);
+    uint64_t* level2 = page_table_walk(true, (uint64_t*)((uint64_t)level1 + VM_MEM_OFFSET), level1_index);
+    uint64_t* level3 = page_table_walk(true, (uint64_t*)((uint64_t)level2 + VM_MEM_OFFSET), level2_index);
     
-    int level0_index = DECODE_ADDR(virt, 39);
-    int level1_index = DECODE_ADDR(virt, 30);
-    int level2_index = DECODE_ADDR(virt, 21);
-    int level3_index = DECODE_ADDR(virt, 12);
+    uint64_t new_entry = phys | flags | 0x3 | (1 << 10);
 
-    uint64_t* level0 = (uint64_t*)(spc->root & 0xFFFFFFFFFFFE);
-
-    // Check for kernel mapping
-    if(virt >= 0xFFFFFFFF80000000 || virt >= 0xffff800000000000)
-        level0 = (uint64_t*)(spc->kernel_root & 0xFFFFFFFFFFFE);
-    
-    uint64_t* level1 = next_level(level0, level0_index);
-    uint64_t* level2 = next_level(level1, level1_index);
-    uint64_t* level3 = next_level(level2, level2_index);
-
-    uint64_t new_entry = phys | 1 | PAGE_L3 | PAGE_ACCESS;
-    new_entry |= flags;
-
-    if (ca == CACHE_WRITE_COMBINE)
-        new_entry |= PAGE_UC | PAGE_OUTER_SH;
-    else if (ca == CACHE_NOCACHE)
-	new_entry |= PAGE_nGnRnE | PAGE_OUTER_SH;
-    else if (ca == CACHE_MMIO)
-	new_entry |= PAGE_nGnRE | PAGE_OUTER_SH;
-    else
-        new_entry |= PAGE_WB | PAGE_INNER_SH;
+    if (ctype == CACHE_STANDARD) {
+        new_entry |= (2 << 2);
+    }
 
     level3[level3_index] = new_entry;
-}
-
-uint64_t arch_translate_virt(vm_aspace_t* spc, uintptr_t virt) {
-    int level0_index = DECODE_ADDR(virt, 39);
-    int level1_index = DECODE_ADDR(virt, 30);
-    int level2_index = DECODE_ADDR(virt, 21);
-    int level3_index = DECODE_ADDR(virt, 12);
-
-    // TODO: Tell next_level to not create page tables (since we're indexing only and not mapping)
-    uint64_t* level0 = (uint64_t*)(spc->root & 0xFFFFFFFFFFFE);
-
-    if(virt >= 0xFFFFFFFF80000000 || virt >= 0xffff800000000000)
-        level0 = (uint64_t*)(spc->kernel_root & 0xFFFFFFFFFFFE);
-    
-    uint64_t* level1 = next_level(level0, level0_index);
-    uint64_t* level2 = next_level(level1, level1_index);
-    uint64_t* level3 = next_level(level2, level2_index);
-
-    return BITS_READ(level3[level3_index], 12, 35);
+    return;
 }
 
 void arch_swap_table(vm_aspace_t* space) {
-    // Only swap ttbr0 since ttbr1 always points to the same page space
-    asm volatile ("dsb st; msr ttbr0_el1, %0; dsb sy; isb" :: "r" (((uint64_t)space->spid << 48) | space->root) : "memory");
+    uint64_t root_val = ((uint64_t)space->spid << 48) | space->root;
+    ARM64_WRITE_REG(ttbr1_el1, space->kernel_root);
+    ARM64_WRITE_REG(ttbr0_el1, root_val);
+
+    // Sync TLB Changes
+    asm volatile ("isb; dsb sy; isb" ::: "memory");
 }

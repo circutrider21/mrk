@@ -1,5 +1,7 @@
 #include <vm/vm.h>
 #include <vm/virtual.h>
+#include <vm/phys.h>
+#include <arch/arch.h>
 #include <lib/stivale2.h>
 #include <lib/builtins.h>
 #include <lib/bitops.h>
@@ -7,7 +9,7 @@
 
 extern bitmap_t map;
 extern uintptr_t highest_addr;
-vm_aspace_t my_space;
+vm_aspace_t root_space;
 
 static void bringup_pmm(struct stivale2_struct_tag_memmap* memory) {
     uintptr_t top;
@@ -60,15 +62,29 @@ static void bringup_pmm(struct stivale2_struct_tag_memmap* memory) {
 }
 
 #ifdef __aarch64__
-static void arch_specific_stuff() {
-    asm volatile ("mrs %0, ttbr1_el1" : "=r" (my_space.kernel_root));
-    vm_virt_setup(&my_space);
-}
+extern struct stivale2_struct_tag_mmio32_uart* mmio_struct;
 #endif
 
+static void aarch64_mmu_setup() {
+    vm_virt_setup(&root_space);
+
+    // Use ttbr1 from the bootloader (much easier)
+    vm_phys_free((void*)root_space.kernel_root, 1);
+    root_space.kernel_root = ARM64_READ_REG(ttbr1_el1);
+
+    // Load ttbr0
+    uint64_t root_val = ((uint64_t)root_space.spid << 48) | root_space.root;
+    ARM64_WRITE_REG(ttbr0_el1, root_val);
+
+    // Sync TLB Changes
+    asm volatile ("isb; dsb sy; isb" ::: "memory");
+}
+
 void vm_init() {
-    struct stivale2_struct_tag_memmap *memory_map = stivale2_query(STIVALE2_STRUCT_TAG_MEMMAP_ID);
+    struct stivale2_struct_tag_memmap *memory_map = (struct stivale2_struct_tag_memmap*)stivale2_query(STIVALE2_STRUCT_TAG_MEMMAP_ID);
     bringup_pmm(memory_map);
-    arch_specific_stuff();
+
+    aarch64_mmu_setup();
+    log("vm: Complete!\n");
 }
 

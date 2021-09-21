@@ -53,8 +53,9 @@ void* vm_phys_alloc(size_t pages, int flags) {
     }
 
 out:
-    if(flags & VM_PAGE_ZERO && ret != NULL)
-        memset(ret, 0, pages * VM_PAGE_SIZE);
+    if(flags & VM_PAGE_ZERO && ret != NULL) {
+        memset(ret + VM_MEM_OFFSET, 0, pages * VM_PAGE_SIZE);
+    }
 
     if (ret == NULL) {
         log("vm/phys: Out Of Memory!\n"); 
