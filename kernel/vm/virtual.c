@@ -1,6 +1,7 @@
 #include <vm/virtual.h>
 #include <vm/phys.h>
 #include <generic/log.h>
+#include <arch/arch.h>
 
 #include <stdbool.h>
 
@@ -35,12 +36,16 @@ static int do_flag_swap(int flags) {
 
 void vm_virt_map(vm_aspace_t* space, uintptr_t virt, uintptr_t phys, int flags, cache_type ctype) {
     int real_flags = do_flag_swap(flags);
-    arch_map_4k(space, phys, virt, real_flags, ctype);
+    if (flags & VM_MAP_2MB) {
+        arch_map_2m(space, phys, virt, real_flags, ctype);
+    } else {
+        arch_map_4k(space, phys, virt, real_flags, ctype);
+    }
 }
 
 void vm_virt_setup(vm_aspace_t* space) {
     space->root = (uintptr_t)vm_phys_alloc(1, VM_PAGE_ZERO);
     space->spid = 0;
-    space->kernel_root = (uintptr_t)vm_phys_alloc(1, VM_PAGE_ZERO);
+    space->kroot = (uintptr_t)vm_phys_alloc(1, VM_PAGE_ZERO);
 }
 

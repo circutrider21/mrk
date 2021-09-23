@@ -15,12 +15,16 @@ SECTIONS {
 
   . = ALIGN(64K);
   .text . : {
+    __ktext_begin = .;
     *(.text*)
+    __ktext_end = .;
   }:text
   
   . = ALIGN(64K);
   .rodata . : {
+    __krdata_begin = .;
     *(.rodata*)
+    __krdata_end = .;
   }:rodata
   
   . = ALIGN(64K);
@@ -29,23 +33,20 @@ SECTIONS {
   }:rodata
 
   . = ALIGN(64K);
-  .initgraph : {
-    __initgraph_start = .;
-    KEEP(*(.initgraph)) 
-    __initgraph_end = .;
-  }:data
-
-  . = ALIGN(64K);
   .data . : {
+    __kdata_begin = .;
     *(.data*)
+    __kdata_end = .;
   }:data
 
   . = ALIGN(64K);
   .bss . : {
+    __kbss_begin = .;
     __stack_low = .;
     . += 16K;
     __stack_high = .;
     *(.bss*)
+    __kbss_end = .;
   }
 }
 

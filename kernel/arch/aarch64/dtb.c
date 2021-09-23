@@ -43,8 +43,7 @@ void init_dtb() {
     if (my_nod.data == NULL)
         log("dtb: Model - Unknown\n");
     else
-	log("dtb: Model - %s\n", my_nod.data);
-
+	    log("dtb: Model - %s\n", my_nod.data);
 }
 
 fdt_node find_attrib(char* node_name, char* attrib_name) {
@@ -55,55 +54,55 @@ fdt_node find_attrib(char* node_name, char* attrib_name) {
     for(;;) {
         uint32_t node_type = bswap_32(*(current++));
 
-	switch(node_type) {
+	    switch(node_type) {
             case 0x1 : { // FDT_BEGIN_NODE
                 char* str = (char*)current;
-		int len = strlen(str);
-		// log("dtb: FDT_BEGIN_NODE [%s]\n", *str == '\0' ? "root" : str);
+		        int len = strlen(str);
+		        // log("dtb: FDT_BEGIN_NODE [%s]\n", *str == '\0' ? "root" : str);
 
-		cur_depth++;
+		        cur_depth++;
                 if (found_depth == 0 && len >= strlen(node_name)) {
-		    if (memcmp(str, node_name, strlen(node_name)) == 0)
-                        found_depth = cur_depth;
+		        if (memcmp(str, node_name, strlen(node_name)) == 0)
+                    found_depth = cur_depth;
                 }
 
-		// Check if root node is wanted
-		if (found_depth == 0 && node_name == NULL && *str == '\0') {
-		    found_depth = cur_depth;
-		}
+		        // Check if root node is wanted
+		        if (found_depth == 0 && node_name == NULL && *str == '\0') {
+		            found_depth = cur_depth;
+		        }
 
                 current += (len + 4) / 4;
-		break;
-	    }
-	    case 0x2: { // FDT_END_NODE
+		        break;
+	        }
+	        case 0x2: { // FDT_END_NODE
                 if(found_depth) {
                     if(found_depth == cur_depth)
-		        found_depth = 0;
-		}
+		                found_depth = 0;
+		        }
 
-		cur_depth--;
-		break;
-	    }
-	    case 0x3 : { // FDT_PROP
-	        uint32_t prop_len = bswap_32(*(current));
-		uint32_t prop_name_offset = bswap_32(*(current + 1));
+		        cur_depth--;
+		        break;
+	        }
+	        case 0x3 : { // FDT_PROP
+	            uint32_t prop_len = bswap_32(*(current));
+		        uint32_t prop_name_offset = bswap_32(*(current + 1));
 
-		char* name = ((uintptr_t)dtb_data + dtb_hdr.string_offset + prop_name_offset);
-		// log("dtb: FDT_PROP [name: %s, size: %x]\n", name, prop_len);
+		        char* name = ((uintptr_t)dtb_data + dtb_hdr.string_offset + prop_name_offset);
+		        // log("dtb: FDT_PROP [name: %s, size: %x]\n", name, prop_len);
 
-		if(found_depth) {
+		        if(found_depth) {
                     if(found_depth == cur_depth) {
                         if(memcmp(name, attrib_name, strlen(name)) == 0)
-			    return (fdt_node){ .data = ((uint8_t*)current + 2), .len = prop_len };
-		    }
-		}
-		prop_len += 3;
+			                return (fdt_node){ .data = ((uint8_t*)current + 2), .len = prop_len };
+		            }
+		        }
+		        prop_len += 3;
                 current += prop_len / 4 + 2;
-		break;
+		        break;
+	        }
+	        case 0x4: break; // FDT_NOP
+	        case 0x9: goto out; // FDT_END
 	    }
-	    case 0x4: break; // FDT_NOP
-	    case 0x9: goto out; // FDT_END
-	}
     }
 
 out:

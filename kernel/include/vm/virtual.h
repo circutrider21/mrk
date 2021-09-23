@@ -8,13 +8,12 @@
 #define VM_PERM_EXEC   (1 << 2)
 #define VM_PERM_USER   (1 << 3)
 #define VM_PERM_GLOBAL (1 << 4)
+#define VM_MAP_2MB     (1 << 5)
 
 typedef struct vm_aspace {
+    uintptr_t kroot;
     uintptr_t root;
     uint32_t spid;
-#ifdef __aarch64__
-    uintptr_t kernel_root;
-#endif
 } vm_aspace_t;
 
 typedef enum {

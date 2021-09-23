@@ -27,6 +27,7 @@ typedef struct {
 #define bswap_64(k) __builtin_bswap64(k)
 
 void init_dtb();
+uint64_t dtb_memsize();
 fdt_node find_attrib(char* node_name, char* attrib_name);
 
 #endif // ARCH_DTB_H
