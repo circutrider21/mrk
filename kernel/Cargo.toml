@@ -1,0 +1,15 @@
+[package]
+name = "mrk"
+version = "0.1.0"
+authors = [ "Yusuf M <circutrider21@gmail.com>" ]
+
+description = "A Modern 64-bit Microkernel written in rust"
+license = "Apache-2.0"
+edition = "2018"
+
+[[bin]]
+name = "mrk"
+path = "src/main.rs"
+
+[dependencies]
+stivale-boot = "0.2.3"
