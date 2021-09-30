@@ -13,3 +13,9 @@ path = "src/main.rs"
 
 [dependencies]
 stivale-boot = "0.2.3"
+log = "0.4"
+spin = "0.5.2"
+
+[dependencies.lazy_static]
+version = "1.0"
+features = ["spin_no_std"]
