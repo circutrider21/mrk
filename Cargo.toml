@@ -15,3 +15,7 @@ debug = true
 [profile.release]
 panic = "abort"
 debug = true
+
+# Tell cargo about our rustc targets
+[env]
+RUST_TARGET_PATH = "./.cargo/"

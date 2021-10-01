@@ -8,17 +8,3 @@ pub unsafe fn outb(port: u16, value: u8) {
        options(preserves_flags, nomem, nostack)
     );
 }
-
-#[inline]
-pub unsafe fn inb(port: u16) -> u8 {
-    let ret: u8;
-
-    asm!(
-        "in al, dx",
-        in("dx") port,
-        out("al") ret,
-        options(preserves_flags, nomem, nostack)
-    );
-
-    ret
-}
