@@ -21,8 +21,10 @@ ld_flags = ['-nostdlib', '--build-id=none']
 kernel_include_dirs = ['include']
 
 if host_machine.cpu_family() == 'aarch64'
+    gnu_ld_command = 'aarch64-linux-gnu-ld'
     subdir('arch/aarch64')
 elif host_machine.cpu_family() == 'x86_64'
+    gnu_ld_command = 'ld'
     subdir('arch/x86_64')
 endif
 
@@ -39,6 +41,6 @@ else
     custom_target('kernel',
             input: [libkrnl],
             output: [kernel_name],
-            command: ['ld', '-o', '@OUTPUT@', ld_flags, '@INPUT@'],
+            command: [gnu_ld_command, '-o', '@OUTPUT@', ld_flags, '@INPUT@'],
             install: true, install_dir: 'boot')
 endif
