@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Configure
-      run: pip3 install meson ninja && sudo apt install gcc-aarch64-linux-gnu qemu-system-arm && meson setup -Dbuildtype=${{env.BUILD_TYPE}} --cross-file assets/mrk-aarch64.txt build
+      run: pip3 install meson ninja && sudo apt install gcc-aarch64-linux-gnu qemu qemu-system-x86_64 qemu-system-arm && meson setup -Dbuildtype=${{env.BUILD_TYPE}} --cross-file assets/mrk-aarch64.txt build
 
     - name: Build
       # Build your program with the given configuration
@@ -30,7 +30,7 @@ jobs:
     
     - name: Insturmentation
       # Run kernel in qemu and save output to logfile
-      run: qemu-system-aarch64 -no-reboot -M virt -d int -cpu cortex-a72 -drive if=pflash,format=raw,file=./assets/sabaton_virt_aa64.bin,readonly=on -m 2G -serial stdio -smp 2 -device ramfb -fw_cfg opt/Sabaton/kernel,file=build/kernel/mrk-aa64.elf 2>&1 | tee Loggin.txt
+      run: qemu-system-aarch64 -vnc :0 -no-reboot -M virt -d int -cpu cortex-a72 -drive if=pflash,format=raw,file=./assets/sabaton_virt_aa64.bin,readonly=on -m 2G -serial stdio -smp 2 -device ramfb -fw_cfg opt/Sabaton/kernel,file=build/kernel/mrk-aa64.elf 2>&1 | tee Loggin.txt
       
     - name: Distribute Kernel
       uses: actions/upload-artifact@v2.2.4
