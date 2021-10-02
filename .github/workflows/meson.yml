@@ -2,7 +2,7 @@ name: Meson
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, new-kernel ]
   pull_request:
     branches: [ master ]
 
@@ -22,19 +22,16 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Configure
-      run: pip3 install meson ninja && sudo apt install nasm clang-12 && cd kernel && CXX=clang++ CC=clang CXX_LD=lld meson setup -Dbuildtype=${{env.BUILD_TYPE}} build
+      run: pip3 install meson ninja && sudo apt install gcc-aarch64-linux-gnu && meson setup -Dbuildtype=${{env.BUILD_TYPE}} --cross-file assets/mrk-aarch64.txt build
 
     - name: Build
       # Build your program with the given configuration
-      run: cd kernel && ninja -C build && git submodule init && git submodule update
-
-    - name: Bundle
-      run: cd kernel && strip build/mrk.elf && ../tools/bundle_iso.sh build ..
+      run: ninja -C build
       
     - name: Distribute
       uses: actions/upload-artifact@v2.2.4
       with:
         # Artifact name
-        name: Beta ISO
+        name: Beta Kernel Binary
         # A file, directory or wildcard pattern that describes what to upload
-        path: kernel/build/mrk-image.iso 
+        path: build/kernel/mrk-aa64.elf
