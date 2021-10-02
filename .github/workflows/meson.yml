@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Configure
-      run: pip3 install meson ninja && sudo apt install gcc-aarch64-linux-gnu qemu qemu-system-x86_64 qemu-system-arm && meson setup -Dbuildtype=${{env.BUILD_TYPE}} --cross-file assets/mrk-aarch64.txt build
+      run: pip3 install meson ninja && sudo apt install gcc-aarch64-linux-gnu qemu qemu-system-x86 qemu-system-arm && meson setup -Dbuildtype=${{env.BUILD_TYPE}} --cross-file assets/mrk-aarch64.txt build
 
     - name: Build
       # Build your program with the given configuration
