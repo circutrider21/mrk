@@ -103,10 +103,10 @@ static void aarch64_mmu_setup(struct stivale2_struct_tag_memmap* mem) {
 
     // Map the framebuffer
     extern uintptr_t framebuffer;
-    extern uint16_t width;
+    extern uint16_t height;
     extern uint16_t pitch;
 
-    for(uint64_t i = 0; i < VM_BYTES_TO_PAGES(width * pitch); i += 0x1000) {
+    for(uint64_t i = 0; i < VM_BYTES_TO_PAGES(height * pitch); i += 0x1000) {
         vm_virt_map(&root_space, framebuffer + i, framebuffer + i - VM_MEM_OFFSET, 
             VM_PERM_READ | VM_PERM_WRITE, CACHE_STANDARD);
     }
