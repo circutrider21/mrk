@@ -118,6 +118,7 @@ static void aarch64_mmu_setup(struct stivale2_struct_tag_memmap* mem) {
 
     // Sync TLB Changes
     asm volatile ("isb; dsb sy; isb" ::: "memory");
+    asm volatile ("TLBI VMALLE1" ::: "memory");
 }
 
 void vm_init() {
