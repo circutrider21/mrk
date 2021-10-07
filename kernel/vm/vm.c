@@ -77,8 +77,8 @@ extern char __kbss_end[];
 
 static void map_range(uint64_t begin, uint64_t end, int flags) {
     uint64_t delta = end - begin;
-    for(uint64_t i = 0; i < VM_BYTES_TO_PAGES(delta); i += 0x1000) {
-        vm_virt_map(&root_space, begin + i + VM_KERNEL_BASE, begin + i, flags, CACHE_STANDARD);
+    for(uint64_t i = 0; i < VM_BYTES_TO_PAGES(delta) * 0x1000; i += 0x1000) {
+        vm_virt_map(&root_space, begin + i, (begin + i) - VM_KERNEL_BASE, flags, CACHE_STANDARD);
     }
 }
 
@@ -90,26 +90,26 @@ static void aarch64_mmu_setup(struct stivale2_struct_tag_memmap* mem) {
     map_range(__krdata_begin, __krdata_end, VM_PERM_READ);
     map_range(__kdata_begin, __kdata_end, VM_PERM_READ | VM_PERM_WRITE);
     map_range(__kbss_begin, __kbss_end, VM_PERM_READ | VM_PERM_WRITE);
+    
+    log("kbegin -> [0x%p, 0x%p]\n", __ktext_begin - VM_KERNEL_BASE, __ktext_begin);
 
     // Map all of memory
-    for (int j = 0; j < mem->entries; j++) {
-        struct stivale2_mmap_entry *entry = &mem->memmap[j];
-
-        for(uint64_t i = 0; i < VM_BYTES_TO_PAGES(entry->length); i += 0x1000) {
-            vm_virt_map(&root_space, entry->base + i + VM_MEM_OFFSET, entry->base + i, 
-                VM_PERM_READ | VM_PERM_WRITE, CACHE_STANDARD);
-        }
-    }
+    vm_virt_map(&root_space, 0, 0 + VM_MEM_OFFSET, VM_PERM_READ | VM_PERM_WRITE | VM_MAP_1G, CACHE_STANDARD);
+    vm_virt_map(&root_space, (250000 * 0x1000), (250000 * 0x1000) + VM_MEM_OFFSET, VM_PERM_READ | VM_PERM_WRITE | VM_MAP_1G, CACHE_STANDARD);
 
     // Map the framebuffer
     extern uintptr_t framebuffer;
     extern uint16_t height;
     extern uint16_t pitch;
 
-    for(uint64_t i = 0; i < VM_BYTES_TO_PAGES(height * pitch); i += 0x1000) {
+    for(uint64_t i = 0; i < VM_BYTES_TO_PAGES(height * pitch) * 0x1000; i += 0x1000) {
         vm_virt_map(&root_space, framebuffer + i, framebuffer + i - VM_MEM_OFFSET, 
             VM_PERM_READ | VM_PERM_WRITE, CACHE_STANDARD);
     }
+
+    // Map the uart
+    extern struct stivale2_struct_tag_mmio32_uart* mmio_struct;
+    vm_virt_map(&root_space, mmio_struct->addr + VM_MEM_OFFSET, mmio_struct->addr, VM_PERM_READ | VM_PERM_WRITE, CACHE_STANDARD);
 
     // Load ttbr0/ttbr1
     uint64_t root_val = ((uint64_t)root_space.spid << 48) | root_space.root;
@@ -118,7 +118,6 @@ static void aarch64_mmu_setup(struct stivale2_struct_tag_memmap* mem) {
 
     // Sync TLB Changes
     asm volatile ("isb; dsb sy; isb" ::: "memory");
-    asm volatile ("TLBI VMALLE1" ::: "memory");
 }
 
 void vm_init() {
@@ -128,5 +127,6 @@ void vm_init() {
     aarch64_mmu_setup(memory_map);
 
     log("vm: Complete!\n");
+    for(;;);
 }
 

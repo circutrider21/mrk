@@ -9,6 +9,7 @@
 #define VM_PERM_USER   (1 << 3)
 #define VM_PERM_GLOBAL (1 << 4)
 #define VM_MAP_2MB     (1 << 5)
+#define VM_MAP_1G      (1 << 6)
 
 typedef struct vm_aspace {
     uintptr_t kroot;

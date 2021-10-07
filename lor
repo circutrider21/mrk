@@ -1,0 +1,47 @@
+ninja: Entering directory `hello'
+[0/1] Running external command run-qemu (wrapped by meson to set env)
+fw_cfg kernel of size 00042090
+Allocating kernel memory
+Bytes allocated for kernel: 000000000002B000
+Loading kernel into memory
+Starting display
+Found ramfb!
+Starting SMP
+Number of CPUs found: 00000004
+Taking exception 11 [Hypervisor Call]
+...from EL1 to EL2
+...with ESR 0x16/0x5a000000
+...handled as PSCI call
+Taking exception 11 [Hypervisor Call]
+...from EL1 to EL2
+...with ESR 0x16/0x5a000000
+...handled as PSCI call
+Taking exception 11 [Hypervisor Call]
+...from EL1 to EL2
+...with ESR 0x16/0x5a000000
+...handled as PSCI call
+Found XSDT!
+Entering kernel...
+
+Hello from mrk!
+dtb: Model - Unknown
+acpi: Revision: 2
+acpi: Found XSDT at 0xffff80004048282e
+acpi: dumping tables...
+    Signature Rev OEMID Address
+    FACP      5   BOCHS 0xffff8000404824aa
+    APIC      3   BOCHS 0xffff8000404825b6
+    GTDT      2   BOCHS 0xffff800040482742
+    MCFG      1   BOCHS 0xffff8000404827a2
+    SPCR      2   BOCHS 0xffff8000404827de
+vm/phys: Dumping Memory Map Entries...
+   +0 [base=0x0 length=1073741824]
+   +1 [base=0x40000000 length=1331200]
+   +2 [base=0x40145000 length=176128]
+   +3 [base=0x40170000 length=49152]
+   +4 [base=0x404a1000 length=4290113536]
+   +5 [base=0x10000000 length=268435456]
+   +6 [base=0x0 length=0]
+vm/phys: bitmap_size is 160KB long
+kbegin -> [0x0000000000200000, 0xffffffff80200000]
+vm: Complete!

@@ -36,7 +36,9 @@ static int do_flag_swap(int flags) {
 
 void vm_virt_map(vm_aspace_t* space, uintptr_t virt, uintptr_t phys, int flags, cache_type ctype) {
     int real_flags = do_flag_swap(flags);
-    if (flags & VM_MAP_2MB) {
+    if (flags & VM_MAP_1G) {
+        arch_map_1g(space, phys, virt, real_flags, ctype);
+    } else if (flags & VM_MAP_2MB) {
         arch_map_2m(space, phys, virt, real_flags, ctype);
     } else {
         arch_map_4k(space, phys, virt, real_flags, ctype);
