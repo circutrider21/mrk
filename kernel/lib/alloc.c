@@ -1,7 +1,7 @@
 #include <lib/alloc.h>
 #include <vm/phys.h>
 #include <vm/vm.h>
-#include <vm/virtual.h>
+// #include <vm/virtual.h>
 #include <stdint.h>
 #include <stddef.h>
 
@@ -848,7 +848,7 @@ void* liballoc_alloc(size_t pages)
     void* to_ret = (void*)(pgs + VM_MEM_OFFSET);
 
     for (size_t i = 0; i < pages; i++) {
-        vm_virt_map(&my_space, pgs, pgs + VM_MEM_OFFSET, VM_PERM_READ | VM_PERM_WRITE, CACHE_STANDARD);
+        // vm_virt_map(&my_space, pgs, pgs + VM_MEM_OFFSET, VM_PERM_READ | VM_PERM_WRITE, CACHE_STANDARD);
         pgs += 0x1000;
     }
 

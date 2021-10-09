@@ -1,6 +1,8 @@
 #include <vm/phys.h>
 #include <vm/vm.h>
 #include <lib/bitops.h>
+#include <lib/builtins.h>
+#include <generic/log.h>
 
 bitmap_t map;
 uintptr_t highest_addr;

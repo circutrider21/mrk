@@ -2,7 +2,6 @@
 #include <generic/log.h>
 #include <lib/stivale2.h>
 #include <lib/builtins.h>
-#include <vm/virtual.h>
 #include <vm/vm.h>
 
 #include <stddef.h>
