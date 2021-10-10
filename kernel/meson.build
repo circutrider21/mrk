@@ -10,6 +10,7 @@ kernel_src = files(
     'generic/acpi/acpi.c',
 
     'vm/phys.c',
+    'vm/virt.c',
     'vm/asid_allocator.c',
     'vm/vm.c',
 )

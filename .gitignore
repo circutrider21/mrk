@@ -1,6 +1,7 @@
 # IDE Directories/Files
 .vscode
 .vimrc
+.idea
 
 # Build Dirs
 out

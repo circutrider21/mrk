@@ -4,6 +4,7 @@ kernel_src += files(
     'dtb.c',
     'intr.c',
     'timer.c',
+    'vmm.c',
     'vectors.S',
 )
 

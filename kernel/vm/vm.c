@@ -1,4 +1,5 @@
 #include <vm/vm.h>
+#include <vm/virt.h>
 #include <vm/phys.h>
 #include <vm/asid_allocator.h>
 #include <lib/stivale2.h>
@@ -69,12 +70,47 @@ extern char __kdata_begin[];
 extern char __kdata_end[];
 extern char __kbss_begin[];
 extern char __kbss_end[];
+
+// Defined in kernel/arch/aarch64/vmm.c
+extern uint64_t kernel_root;
 #endif
+
+static vm_aspace_t root_space;
+
+static void map_krange(uint64_t begin, uint64_t end, int flags) {
+  uint64_t delta = end - begin;
+  for(uint64_t i = 0; i < VM_BYTES_TO_PAGES(delta) * 0x1000; i += 0x1000) {
+    uint64_t ph = begin + i - VM_KERNEL_BASE;
+    uint64_t vh = begin + i;
+    log("p -> 0x%p, v -> 0x%p\n", ph, vh);
+    vm_virt_map(&root_space, ph, vh, flags);
+  }
+}
+
+void aarch64_mmu_setup() {
+  // Load ttbr1 into kernel_root (since we're going to use Sabaton's pagemap)
+  asm volatile ("mrs %0, ttbr1_el1" : "=r" (kernel_root));
+
+  root_space.asid = vm_asid_alloc();
+  root_space.root_addr = (uintptr_t)vm_phys_alloc(1, VM_PAGE_ZERO);
+
+  log("phys: 0x%p -> virt: 0x%p\n", __ktext_begin - VM_KERNEL_BASE, __ktext_begin);
+
+  // Map the kernel properly
+  map_krange((uint64_t)__ktext_begin, (uint64_t)__ktext_end, VM_PROT_READ | VM_PROT_EXEC);
+  map_krange((uint64_t)__krdata_begin, (uint64_t)__krdata_end, VM_PROT_READ);
+  map_krange((uint64_t)__kdata_begin, (uint64_t)__kdata_end, VM_PROT_READ | VM_PROT_WRITE);
+  map_krange((uint64_t)__kbss_begin, (uint64_t)__kbss_end, VM_PROT_READ | VM_PROT_WRITE);
+
+  log("res-> %d\n", pmap_emulate_bits(&root_space, __ktext_begin, VM_PROT_READ | VM_PROT_EXEC));
+}
 
 void vm_init() {
     struct stivale2_struct_tag_memmap *memory_map = (struct stivale2_struct_tag_memmap*)stivale2_query(STIVALE2_STRUCT_TAG_MEMMAP_ID);
     bringup_pmm(memory_map);
 
     setup_asid();
+    aarch64_mmu_setup();
+    // pmap_test();
 }
 
